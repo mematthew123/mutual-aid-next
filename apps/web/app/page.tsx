@@ -1,45 +1,9 @@
 import Link from "next/link";
 import { Container, Section } from "@/components/layout";
 import { Button, Card, CardContent, Badge } from "@/components/ui";
-import { RequestCard } from "@/components/cards";
+import { RequestCard, OfferCard } from "@/components/cards";
 import { HeartIcon, FoodIcon, TransportIcon, HousingIcon } from "@/components/icons/category-icons";
-
-// Demo data - will be replaced with Sanity queries
-const demoRequests = [
-  {
-    _id: "1",
-    title: "Groceries needed for family of 4",
-    description:
-      "We're a family going through a tough time and could use help with groceries this week. Any assistance would be greatly appreciated.",
-    urgency: "critical" as const,
-    status: "open" as const,
-    neighborhood: "Westside",
-    category: { title: "Food", slug: { current: "food" } },
-    _createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    _id: "2",
-    title: "Ride to medical appointment",
-    description:
-      "Need transportation to doctor's appointment on Friday morning. Located downtown, appointment is at the medical center.",
-    urgency: "high" as const,
-    status: "open" as const,
-    neighborhood: "Downtown",
-    category: { title: "Transportation", slug: { current: "transport" } },
-    _createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    _id: "3",
-    title: "Help moving furniture",
-    description:
-      "Moving to a new apartment and could use help carrying some furniture. Just a few items, shouldn't take more than an hour.",
-    urgency: "medium" as const,
-    status: "open" as const,
-    neighborhood: "Northside",
-    category: { title: "Housing", slug: { current: "housing" } },
-    _createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-  },
-];
+import { getFeaturedRequests, getFeaturedOffers } from "@/lib/sanity";
 
 const impactStats = [
   { label: "Families Helped", value: "1,247" },
@@ -48,7 +12,13 @@ const impactStats = [
   { label: "Active Volunteers", value: "156" },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Fetch real data from Sanity
+  const [requests, offers] = await Promise.all([
+    getFeaturedRequests(6),
+    getFeaturedOffers(3),
+  ]);
+
   return (
     <>
       {/* Hero Section */}
@@ -138,7 +108,7 @@ export default function HomePage() {
       {/* Current Needs */}
       <Section spacing="lg" background="muted">
         <Container>
-          <div className="flex items-end justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
             <div>
               <h2 className="text-3xl font-bold text-stone-800">
                 Current Needs
@@ -152,16 +122,60 @@ export default function HomePage() {
             </Button>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {demoRequests.map((request) => (
-              <RequestCard key={request._id} request={request} />
-            ))}
-          </div>
+          {requests.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {requests.map((request) => (
+                <RequestCard key={request._id} request={request} />
+              ))}
+            </div>
+          ) : (
+            <Card variant="outlined" className="text-center py-12">
+              <CardContent>
+                <HeartIcon className="size-12 text-stone-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-stone-600 mb-2">
+                  No open requests right now
+                </h3>
+                <p className="text-stone-500 mb-6">
+                  Check back soon or browse available offers
+                </p>
+                <Button variant="secondary" asChild>
+                  <Link href="/offers">Browse Offers</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </Container>
       </Section>
 
+      {/* Available Help */}
+      {offers.length > 0 && (
+        <Section spacing="lg">
+          <Container>
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+              <div>
+                <h2 className="text-3xl font-bold text-stone-800">
+                  Available Help
+                </h2>
+                <p className="mt-2 text-stone-600">
+                  Neighbors ready to lend a hand
+                </p>
+              </div>
+              <Button variant="ghost" asChild>
+                <Link href="/offers">View all offers →</Link>
+              </Button>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {offers.map((offer) => (
+                <OfferCard key={offer._id} offer={offer} />
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )}
+
       {/* Impact Stats */}
-      <Section spacing="lg">
+      <Section spacing="lg" background={offers.length > 0 ? "muted" : "default"}>
         <Container>
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-stone-800">
