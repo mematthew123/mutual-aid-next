@@ -4,6 +4,9 @@ import type {
   ResourceOffer,
   Category,
   Event,
+  CommunityResource,
+  DonationCampaign,
+  Page,
   RequestFilters,
   OfferFilters,
 } from "./types";
@@ -195,4 +198,123 @@ export async function getUniqueNeighborhoods(): Promise<string[]> {
     )
   `);
   return neighborhoods.filter(Boolean).sort();
+}
+
+// ============================================================================
+// Events (Extended)
+// ============================================================================
+
+export async function getAllEvents(): Promise<Event[]> {
+  return client.fetch(
+    `*[_type == "event" && status == "published"] | order(startDateTime asc) ${eventProjection}`
+  );
+}
+
+export async function getEventBySlug(slug: string): Promise<Event | null> {
+  return client.fetch(
+    `*[_type == "event" && slug.current == $slug][0] ${eventProjection}`,
+    { slug }
+  );
+}
+
+// ============================================================================
+// Community Resources
+// ============================================================================
+
+const resourceProjection = `{
+  _id,
+  _type,
+  _createdAt,
+  name,
+  "slug": slug.current,
+  description,
+  "categories": categories[]->${categoryProjection},
+  contact,
+  hours,
+  eligibility,
+  howToAccess,
+  languages,
+  accessibility,
+  serviceArea,
+  isFeatured,
+  isVerified,
+  lastVerified
+}`;
+
+export async function getAllResources(): Promise<CommunityResource[]> {
+  return client.fetch(
+    `*[_type == "communityResource" && isVerified == true] | order(isFeatured desc, name asc) ${resourceProjection}`
+  );
+}
+
+export async function getResourceBySlug(slug: string): Promise<CommunityResource | null> {
+  return client.fetch(
+    `*[_type == "communityResource" && slug.current == $slug][0] ${resourceProjection}`,
+    { slug }
+  );
+}
+
+// ============================================================================
+// Donation Campaigns
+// ============================================================================
+
+const campaignProjection = `{
+  _id,
+  _type,
+  _createdAt,
+  title,
+  "slug": slug.current,
+  campaignType,
+  description,
+  image,
+  goal,
+  timeline,
+  donationOptions,
+  donationLinks,
+  acceptsInKind,
+  inKindNeeds,
+  dropOffInfo,
+  status,
+  isFeatured,
+  updates
+}`;
+
+export async function getActiveCampaigns(): Promise<DonationCampaign[]> {
+  return client.fetch(
+    `*[_type == "donationCampaign" && status in ["active", "goalReached"]] | order(isFeatured desc, _createdAt desc) ${campaignProjection}`
+  );
+}
+
+export async function getCampaignBySlug(slug: string): Promise<DonationCampaign | null> {
+  return client.fetch(
+    `*[_type == "donationCampaign" && slug.current == $slug][0] ${campaignProjection}`,
+    { slug }
+  );
+}
+
+// ============================================================================
+// Pages (CMS)
+// ============================================================================
+
+const pageProjection = `{
+  _id,
+  _type,
+  _createdAt,
+  title,
+  "slug": slug.current,
+  pageBuilder,
+  seo
+}`;
+
+export async function getPageBySlug(slug: string): Promise<Page | null> {
+  return client.fetch(
+    `*[_type == "page" && slug.current == $slug][0] ${pageProjection}`,
+    { slug }
+  );
+}
+
+export async function getAllPageSlugs(): Promise<string[]> {
+  return client.fetch(
+    `*[_type == "page"].slug.current`
+  );
 }

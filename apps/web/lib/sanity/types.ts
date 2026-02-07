@@ -67,57 +67,100 @@ export interface Event {
   _type: "event";
   _createdAt: string;
   title: string;
-  slug: {
-    current: string;
-  };
-  description?: string;
-  eventType?: "distribution" | "workshop" | "social" | "volunteer" | "fundraiser" | "other";
-  status: "draft" | "published" | "cancelled";
+  slug: string; // Projected as string in queries
+  description?: unknown[]; // Portable Text blocks
+  eventType?: "distribution" | "volunteer" | "meeting" | "workshop" | "fundraiser" | "social" | "other";
+  status: "draft" | "published" | "cancelled" | "postponed" | "completed";
   startDateTime: string;
   endDateTime?: string;
-  locationType?: "inPerson" | "virtual" | "hybrid";
-  location?: EventLocation;
-  virtualLink?: string;
-  registrationRequired?: boolean;
-  maxAttendees?: number;
+  location?: {
+    type?: "inPerson" | "virtual" | "hybrid";
+    venue?: string;
+    address?: string;
+    virtualLink?: string;
+    accessibilityInfo?: string;
+  };
+  registration?: {
+    required?: boolean;
+    link?: string;
+    deadline?: string;
+    capacity?: number;
+  };
   isRecurring?: boolean;
-  recurringPattern?: "daily" | "weekly" | "biweekly" | "monthly";
+  recurrencePattern?: "weekly" | "biweekly" | "monthly" | "firstOfMonth" | "lastOfMonth";
+  volunteersNeeded?: number;
 }
 
 export interface CommunityResource {
   _id: string;
   _type: "communityResource";
+  _createdAt: string;
   name: string;
-  slug: {
-    current: string;
-  };
+  slug: string; // Projected as string in queries
   description?: string;
-  resourceType?: string;
-  address?: string;
-  neighborhood?: string;
-  phone?: string;
-  email?: string;
-  website?: string;
+  categories?: Category[];
+  contact?: {
+    phone?: string;
+    email?: string;
+    website?: string;
+    address?: string;
+  };
   hours?: string;
-  isVerified?: boolean;
+  eligibility?: unknown[]; // Portable Text blocks
+  howToAccess?: unknown[]; // Portable Text blocks
+  languages?: string[];
+  accessibility?: string[];
+  serviceArea?: string;
   isFeatured?: boolean;
-  languagesOffered?: string[];
+  isVerified?: boolean;
+  lastVerified?: string;
 }
 
 export interface DonationCampaign {
   _id: string;
   _type: "donationCampaign";
+  _createdAt: string;
   title: string;
-  slug: {
-    current: string;
+  slug: string; // Projected as string in queries
+  campaignType?: "general" | "emergency" | "specific" | "recurring";
+  description?: unknown[]; // Portable Text blocks
+  image?: {
+    asset?: { _ref: string };
+    alt?: string;
   };
-  description?: string;
-  status: "active" | "completed" | "paused";
-  goalAmount?: number;
-  amountRaised?: number;
-  startDate?: string;
-  endDate?: string;
+  goal?: {
+    hasGoal?: boolean;
+    amount?: number;
+    currentAmount?: number;
+    showProgress?: boolean;
+  };
+  timeline?: {
+    startDate?: string;
+    endDate?: string;
+    isOngoing?: boolean;
+  };
+  donationOptions?: Array<{
+    amount?: number;
+    label?: string;
+  }>;
+  donationLinks?: {
+    venmo?: string;
+    cashapp?: string;
+    paypal?: string;
+    gofundme?: string;
+    other?: string;
+    otherLabel?: string;
+  };
+  acceptsInKind?: boolean;
+  inKindNeeds?: string[];
+  dropOffInfo?: string;
+  status: "draft" | "active" | "goalReached" | "ended";
   isFeatured?: boolean;
+  updates?: Array<{
+    date?: string;
+    title?: string;
+    content?: unknown[];
+  }>;
 }
 
 export interface TeamMember {
@@ -127,6 +170,20 @@ export interface TeamMember {
   role?: string;
   bio?: string;
   email?: string;
+}
+
+export interface Page {
+  _id: string;
+  _type: "page";
+  _createdAt: string;
+  title: string;
+  slug: string; // Projected as string in queries
+  pageBuilder?: unknown[]; // Array of page builder blocks
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    ogImage?: { asset?: { _ref: string } };
+  };
 }
 
 export interface Settings {
