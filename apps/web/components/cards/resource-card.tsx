@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { getCategoryIcon, LocationIcon } from "@/components/icons/category-icons";
 import type { CommunityResource } from "@/lib/sanity/types";
 
-export interface ResourceCardProps extends HTMLAttributes<HTMLDivElement> {
+export interface ResourceCardProps extends Omit<HTMLAttributes<HTMLDivElement>, "resource"> {
   resource: CommunityResource;
 }
 
