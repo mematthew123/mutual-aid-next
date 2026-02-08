@@ -5,6 +5,7 @@
   "packageManager": "npm@11.5.2",
   "workspaces": [
     "apps/*",
+    "apps/dashboard-apps/*",
     "packages/*"
   ],
   "scripts": {
@@ -14,7 +15,9 @@
     "dev:web": "turbo dev --filter=@mutual-aid/web",
     "dev:studio": "turbo dev --filter=@mutual-aid/studio",
     "build:web": "turbo build --filter=@mutual-aid/web",
-    "build:studio": "turbo build --filter=@mutual-aid/studio"
+    "build:studio": "turbo build --filter=@mutual-aid/studio",
+    "dev:dashboard": "turbo dev --filter=@mutual-aid/example-app",
+    "build:dashboard": "turbo build --filter=@mutual-aid/example-app"
   },
   "devDependencies": {
     "turbo": "^2"
