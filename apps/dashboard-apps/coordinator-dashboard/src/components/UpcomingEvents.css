@@ -1,0 +1,4 @@
+.upcoming-events__list {
+  display: flex;
+  flex-direction: column;
+}

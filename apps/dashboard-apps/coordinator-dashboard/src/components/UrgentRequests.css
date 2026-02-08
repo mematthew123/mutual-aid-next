@@ -1,0 +1,15 @@
+.urgent-requests__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.urgent-row--loading {
+  padding: 0.75rem 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.urgent-row--loading:last-child {
+  border-bottom: none;
+}

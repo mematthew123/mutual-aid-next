@@ -17,7 +17,9 @@
     "build:web": "turbo build --filter=@mutual-aid/web",
     "build:studio": "turbo build --filter=@mutual-aid/studio",
     "dev:dashboard": "turbo dev --filter=@mutual-aid/example-app",
-    "build:dashboard": "turbo build --filter=@mutual-aid/example-app"
+    "build:dashboard": "turbo build --filter=@mutual-aid/example-app",
+    "dev:coordinator": "turbo dev --filter=@mutual-aid/coordinator-dashboard",
+    "build:coordinator": "turbo build --filter=@mutual-aid/coordinator-dashboard"
   },
   "devDependencies": {
     "turbo": "^2"
