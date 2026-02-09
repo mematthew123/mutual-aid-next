@@ -1,7 +1,6 @@
-import {useCallback, useState} from 'react'
-import {useExternalScript} from '../hooks/useExternalScript'
-
-const ML_SCRIPT_URL = 'https://media-library.cloudinary.com/global/all.js'
+import {useCallback, useRef, useState, useMemo} from 'react'
+import {useCloudinaryAssets} from '../hooks/useCloudinaryAssets'
+import type {CloudinaryProxyAsset} from '../types/cloudinary'
 
 interface MediaLibraryBrowserProps {
   config: {
@@ -10,92 +9,231 @@ interface MediaLibraryBrowserProps {
   }
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
 export function MediaLibraryBrowser({config}: MediaLibraryBrowserProps) {
-  const {loaded, error} = useExternalScript(ML_SCRIPT_URL)
-  const [copied, setCopied] = useState(false)
-  const [selectedCount, setSelectedCount] = useState(0)
+  const [searchInput, setSearchInput] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
 
-  const openLibrary = useCallback(() => {
-    if (!window.cloudinary) return
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchInput(value)
+    clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      setDebouncedQuery(value)
+    }, 400)
+  }, [])
 
-    // Use openMediaLibrary (modal mode) — avoids nested iframe cookie
-    // isolation that prevents authentication in inline mode.
-    // This is the same approach used by the official sanity-plugin-cloudinary.
-    window.cloudinary.openMediaLibrary(
-      {
-        cloud_name: config.cloudName,
-        api_key: config.apiKey,
-        multiple: true,
-        insert_caption: 'Select',
-        default_transformations: [[{quality: 'auto'}, {fetch_format: 'auto'}]],
-        integration: {
-          type: 'sanity_mutual_aid',
-          platform: 'sanity',
-          version: '1.0.0',
-          environment: 'production',
-        },
-      },
-      {
-        insertHandler: (data) => {
-          if (data?.assets?.length) {
-            const urls = data.assets.map((a) => {
-              // Prefer derived (transformed) URL when available
-              if (a.derived?.length) {
-                return a.derived[0].secure_url
-              }
-              return a.secure_url
-            })
-            setSelectedCount(urls.length)
-            navigator.clipboard
-              .writeText(urls.join('\n'))
-              .then(() => {
-                setCopied(true)
-                setTimeout(() => setCopied(false), 3000)
-              })
-              .catch(() => {})
-          }
-        },
-      },
-    )
-  }, [config.cloudName, config.apiKey])
+  const options = useMemo(
+    () => (debouncedQuery ? {query: debouncedQuery} : {}),
+    [debouncedQuery],
+  )
 
-  if (error) {
+  const {assets, isLoading, error, hasMore, loadMore, refresh} =
+    useCloudinaryAssets(options)
+
+  const thumbnailUrl = (asset: CloudinaryProxyAsset) => {
+    if (asset.resource_type !== 'image') return null
+    return `https://res.cloudinary.com/${config.cloudName}/image/upload/c_fill,w_300,h_200,f_auto,q_auto/${asset.public_id}.${asset.format}`
+  }
+
+  const copyUrl = async (asset: CloudinaryProxyAsset) => {
+    try {
+      await navigator.clipboard.writeText(asset.secure_url)
+      setCopiedId(asset.public_id)
+      setTimeout(() => setCopiedId(null), 2000)
+    } catch {
+      // Clipboard API may not be available in all contexts
+    }
+  }
+
+  // Error state
+  if (error && assets.length === 0) {
     return (
-      <div className="px-8 py-12 text-center text-cl-red">
-        <p>{error}</p>
+      <div className="px-8 py-12 text-center">
+        <p className="text-cl-red m-0 mb-3">{error}</p>
+        <button
+          className="px-4 py-2 bg-cl-blue text-white border-none rounded-lg text-sm/5 font-medium cursor-pointer hover:bg-cl-blue-dark"
+          onClick={refresh}
+          type="button"
+        >
+          Retry
+        </button>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col items-center justify-center px-8 py-16 gap-6">
-      <div className="flex flex-col items-center gap-3 text-center">
-        <svg viewBox="0 0 24 24" width="48" height="48" fill="#3448c5">
-          <path d="M19.31 8.91A6.44 6.44 0 0 0 6.85 7.57a4.88 4.88 0 0 0-2.57 9.15.5.5 0 0 0 .35-.94 3.88 3.88 0 0 1 2.06-7.28l.4.04.13-.38a5.44 5.44 0 0 1 10.52 1.15l.09.56.52.2a3.38 3.38 0 0 1-.99 6.62h-.8a.5.5 0 0 0 0 1h.8a4.38 4.38 0 0 0 1.95-8.28zM14.35 14.7a.5.5 0 0 0 .71-.71l-2.82-2.83a.51.51 0 0 0-.36-.15.5.5 0 0 0-.36.15L8.7 13.99a.5.5 0 0 0 .71.71l1.97-1.97v5.78a.5.5 0 0 0 1 0v-5.78z" />
-        </svg>
-        <h2 className="m-0 text-lg font-semibold text-gray-900">
-          Cloudinary Media Library
-        </h2>
-        <p className="m-0 text-sm/6 text-gray-500 max-w-md">
-          Browse, search, and select media assets from your Cloudinary account.
-          Selected asset URLs will be copied to your clipboard.
-        </p>
+    <div className="flex flex-col gap-4 p-5">
+      {/* Toolbar: search + refresh */}
+      <div className="flex gap-3 items-center">
+        <div className="relative flex-1">
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search assets..."
+            value={searchInput}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm/5 bg-white text-gray-900 placeholder-gray-400 outline-hidden focus:border-cl-blue transition-colors duration-150"
+          />
+        </div>
+        <button
+          className="px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-500 cursor-pointer text-sm hover:bg-gray-50 hover:border-gray-300 transition-colors duration-150"
+          onClick={refresh}
+          title="Refresh"
+          type="button"
+        >
+          &#x21bb;
+        </button>
       </div>
 
-      <button
-        className="px-8 py-3 bg-cl-blue text-white border-none rounded-lg text-sm/5 font-medium cursor-pointer transition-colors duration-150 hover:bg-cl-blue-dark disabled:opacity-60 disabled:cursor-not-allowed"
-        onClick={openLibrary}
-        disabled={!loaded}
-        type="button"
-      >
-        {!loaded ? 'Loading...' : 'Open Media Library'}
-      </button>
-
-      {copied && (
-        <p className="m-0 text-sm text-cl-green font-medium">
-          {selectedCount} asset URL{selectedCount !== 1 ? 's' : ''} copied to
-          clipboard
+      {/* Asset count */}
+      {assets.length > 0 && !isLoading && (
+        <p className="m-0 text-xs text-gray-500">
+          {assets.length} asset{assets.length !== 1 ? 's' : ''} loaded
+          {hasMore ? ' (more available)' : ''}
         </p>
+      )}
+
+      {/* Loading — initial */}
+      {isLoading && assets.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 gap-4 text-gray-500">
+          <div
+            className="size-8 border-3 border-gray-200 border-t-cl-blue rounded-full"
+            style={{animation: 'cl-spin 0.8s linear infinite'}}
+          />
+          <p className="m-0 text-sm">Loading assets...</p>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!isLoading && assets.length === 0 && !error && (
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-500">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+          <p className="m-0 text-sm">
+            {debouncedQuery
+              ? 'No assets match your search'
+              : 'No assets found in your Cloudinary account'}
+          </p>
+        </div>
+      )}
+
+      {/* Asset grid */}
+      {assets.length > 0 && (
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
+          {assets.map((asset) => {
+            const thumb = thumbnailUrl(asset)
+            const isCopied = copiedId === asset.public_id
+            const displayName =
+              asset.public_id.split('/').pop() || asset.public_id
+
+            return (
+              <button
+                key={asset.public_id}
+                className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 cursor-pointer transition-all duration-150 hover:shadow-sm hover:border-gray-300 text-left p-0 relative"
+                onClick={() => copyUrl(asset)}
+                title={`Copy URL: ${asset.secure_url}`}
+                type="button"
+              >
+                {/* Thumbnail */}
+                {thumb ? (
+                  <img
+                    src={thumb}
+                    alt={displayName}
+                    className="w-full h-[140px] object-cover block bg-gray-100"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-full h-[140px] flex items-center justify-center bg-gray-100 text-gray-400">
+                    <svg
+                      width="32"
+                      height="32"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                  </div>
+                )}
+
+                {/* Metadata */}
+                <div className="p-2.5 flex flex-col gap-1">
+                  <span className="text-xs font-medium text-gray-700 overflow-hidden text-ellipsis whitespace-nowrap">
+                    {displayName}
+                  </span>
+                  <span className="text-[11px] text-gray-500">
+                    {asset.width > 0 && asset.height > 0
+                      ? `${asset.width}×${asset.height} · `
+                      : ''}
+                    {asset.format} · {formatBytes(asset.bytes)}
+                  </span>
+                </div>
+
+                {/* Copied confirmation overlay */}
+                {isCopied && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
+                    <span className="text-white text-sm font-medium px-3 py-1.5 bg-cl-green rounded-md">
+                      URL copied
+                    </span>
+                  </div>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Inline error (when some assets already loaded) */}
+      {error && assets.length > 0 && (
+        <p className="m-0 text-sm text-cl-red text-center">{error}</p>
+      )}
+
+      {/* Load more */}
+      {hasMore && (
+        <div className="flex justify-center pt-2">
+          <button
+            className="px-6 py-2.5 bg-cl-blue text-white border-none rounded-lg text-sm/5 font-medium cursor-pointer transition-colors duration-150 hover:bg-cl-blue-dark disabled:opacity-60 disabled:cursor-not-allowed"
+            onClick={loadMore}
+            disabled={isLoading}
+            type="button"
+          >
+            {isLoading ? 'Loading...' : 'Load More'}
+          </button>
+        </div>
       )}
     </div>
   )

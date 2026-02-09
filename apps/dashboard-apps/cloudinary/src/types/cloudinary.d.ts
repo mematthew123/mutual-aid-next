@@ -76,6 +76,26 @@ export interface CloudinaryUploadWidget {
   destroy: () => void
 }
 
+/** Shape returned by the /api/cloudinary proxy */
+export interface CloudinaryProxyAsset {
+  public_id: string
+  format: string
+  resource_type: string
+  width: number
+  height: number
+  bytes: number
+  secure_url: string
+  tags: string[]
+  created_at: string
+  folder: string
+}
+
+export interface CloudinaryProxyResponse {
+  assets: CloudinaryProxyAsset[]
+  next_cursor: string | null
+  total_count: number
+}
+
 declare global {
   interface Window {
     cloudinary?: {

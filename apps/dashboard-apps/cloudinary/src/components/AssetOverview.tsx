@@ -83,10 +83,12 @@ export function AssetOverview({config}: AssetOverviewProps) {
           Integration Info
         </h3>
         <p className="text-gray-500 text-sm/6 m-0 mb-4">
-          This dashboard app uses the Cloudinary Media Library and Upload
-          widgets. Assets selected here can be used with the Cloudinary asset
-          source plugin in Sanity Studio, which adds a &quot;Cloudinary&quot;
-          option to all image fields.
+          The Browse tab fetches assets via a Next.js API proxy
+          (<code className="bg-gray-100 px-1 rounded-xs text-xs">/api/cloudinary</code>)
+          that calls the Cloudinary Admin &amp; Search APIs server-side. The Upload
+          tab uses the Cloudinary Upload Widget. The Cloudinary asset source
+          plugin in Sanity Studio adds a &quot;Cloudinary&quot; option to all
+          image fields.
         </p>
         <div className="mt-4">
           <h4 className="m-0 mb-2 text-sm text-gray-700">
@@ -132,6 +134,46 @@ export function AssetOverview({config}: AssetOverviewProps) {
                 </td>
                 <td className="px-3 py-2 border-b border-gray-200 text-gray-700">
                   Dashboard App (Upload)
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2 border-b border-gray-200 text-gray-700">
+                  <code className="bg-gray-100 px-1.5 py-0.5 rounded-xs text-xs">
+                    SANITY_APP_API_URL
+                  </code>
+                </td>
+                <td className="px-3 py-2 border-b border-gray-200 text-gray-700">
+                  Dashboard App (Browse)
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2 border-b border-gray-200 text-gray-700">
+                  <code className="bg-gray-100 px-1.5 py-0.5 rounded-xs text-xs">
+                    CLOUDINARY_CLOUD_NAME
+                  </code>
+                </td>
+                <td className="px-3 py-2 border-b border-gray-200 text-gray-700">
+                  Next.js API (server)
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2 border-b border-gray-200 text-gray-700">
+                  <code className="bg-gray-100 px-1.5 py-0.5 rounded-xs text-xs">
+                    CLOUDINARY_API_KEY
+                  </code>
+                </td>
+                <td className="px-3 py-2 border-b border-gray-200 text-gray-700">
+                  Next.js API (server)
+                </td>
+              </tr>
+              <tr>
+                <td className="px-3 py-2 border-b border-gray-200 text-gray-700">
+                  <code className="bg-gray-100 px-1.5 py-0.5 rounded-xs text-xs">
+                    CLOUDINARY_API_SECRET
+                  </code>
+                </td>
+                <td className="px-3 py-2 border-b border-gray-200 text-gray-700">
+                  Next.js API (server)
                 </td>
               </tr>
               <tr>
