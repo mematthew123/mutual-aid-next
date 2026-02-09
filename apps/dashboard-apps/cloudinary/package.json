@@ -1,0 +1,28 @@
+{
+  "name": "@mutual-aid/cloudinary-dashboard",
+  "private": true,
+  "version": "1.0.0",
+  "main": "package.json",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "start": "sanity start"
+  },
+  "keywords": [
+    "sanity"
+  ],
+  "dependencies": {
+    "@sanity/sdk": "^2",
+    "@sanity/sdk-react": "^2",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/react": "^19",
+    "sanity": "^4",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.1.6"
+  }
+}

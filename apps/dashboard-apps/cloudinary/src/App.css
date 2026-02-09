@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  /* Cloudinary brand colors */
+  --color-cl-blue: #3448c5;
+  --color-cl-blue-light: #6c7ce0;
+  --color-cl-blue-dark: #2a3a9e;
+  --color-cl-red: #e03131;
+  --color-cl-green: #2f9e44;
+}
+
+/* Spinner animation — cannot be expressed as pure utilities */
+@keyframes cl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

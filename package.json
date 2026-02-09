@@ -19,9 +19,14 @@
     "dev:dashboard": "turbo dev --filter=@mutual-aid/example-app",
     "build:dashboard": "turbo build --filter=@mutual-aid/example-app",
     "dev:coordinator": "turbo dev --filter=@mutual-aid/coordinator-dashboard",
-    "build:coordinator": "turbo build --filter=@mutual-aid/coordinator-dashboard"
+    "build:coordinator": "turbo build --filter=@mutual-aid/coordinator-dashboard",
+    "dev:cloudinary": "turbo dev --filter=@mutual-aid/cloudinary-dashboard",
+    "build:cloudinary": "turbo build --filter=@mutual-aid/cloudinary-dashboard"
   },
   "devDependencies": {
     "turbo": "^2"
+  },
+  "dependencies": {
+    "lightningcss": "^1.31.1"
   }
 }
