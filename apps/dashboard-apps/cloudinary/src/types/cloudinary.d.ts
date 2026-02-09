@@ -83,6 +83,10 @@ declare global {
         options: CloudinaryMediaLibraryOptions,
         callbacks: CloudinaryMediaLibraryCallbacks,
       ) => CloudinaryMediaLibraryWidget
+      openMediaLibrary: (
+        options: CloudinaryMediaLibraryOptions,
+        callbacks: CloudinaryMediaLibraryCallbacks,
+      ) => void
       createUploadWidget: (
         options: CloudinaryUploadWidgetOptions,
         callback: (error: Error | null, result: CloudinaryUploadResult) => void,
