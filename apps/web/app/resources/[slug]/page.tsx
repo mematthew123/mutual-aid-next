@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Container, Section } from "@/components/layout";
 import { Button, Badge, Card, CardContent } from "@/components/ui";
+import { PortableTextRenderer } from "@/components/portable-text";
 import { getCategoryIcon, LocationIcon } from "@/components/icons/category-icons";
 import { getResourceBySlug } from "@/lib/sanity";
 
@@ -93,6 +94,26 @@ export default async function ResourceDetailPage({ params }: ResourceDetailPageP
                       <p className="text-stone-600 whitespace-pre-wrap leading-relaxed">
                         {resource.description}
                       </p>
+                    </div>
+                  )}
+
+                  {/* Eligibility */}
+                  {resource.eligibility && Array.isArray(resource.eligibility) && resource.eligibility.length > 0 && (
+                    <div className="mb-6">
+                      <h2 className="text-sm font-semibold text-stone-700 mb-2">
+                        Eligibility Requirements
+                      </h2>
+                      <PortableTextRenderer value={resource.eligibility} />
+                    </div>
+                  )}
+
+                  {/* How to Access */}
+                  {resource.howToAccess && Array.isArray(resource.howToAccess) && resource.howToAccess.length > 0 && (
+                    <div className="mb-6">
+                      <h2 className="text-sm font-semibold text-stone-700 mb-2">
+                        How to Access
+                      </h2>
+                      <PortableTextRenderer value={resource.howToAccess} />
                     </div>
                   )}
 

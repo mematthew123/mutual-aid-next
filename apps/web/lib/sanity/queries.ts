@@ -302,7 +302,34 @@ const pageProjection = `{
   _createdAt,
   title,
   "slug": slug.current,
-  pageBuilder,
+  pageBuilder[]{
+    ...,
+    _type == "hero" => {
+      ...,
+      ctas[]{
+        ...,
+        internalLink->{ "slug": slug.current }
+      }
+    },
+    _type == "callToAction" => {
+      ...,
+      internalLink->{ "slug": slug.current },
+      donationCampaign->{ "slug": slug.current }
+    },
+    _type == "featuredResources" => {
+      ...,
+      "resources": resources[]->${resourceProjection},
+      category->{ _id, title, slug }
+    },
+    _type == "upcomingEvents" => {
+      ...,
+      "events": events[]->${eventProjection}
+    },
+    _type == "teamSection" => {
+      ...,
+      "teamMembers": teamMembers[]->{ _id, name, role, bio, email }
+    }
+  },
   seo
 }`;
 

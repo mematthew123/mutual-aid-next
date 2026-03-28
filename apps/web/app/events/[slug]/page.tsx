@@ -2,8 +2,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Container, Section } from "@/components/layout";
 import { Button, Badge, Card, CardContent } from "@/components/ui";
+import { PortableTextRenderer } from "@/components/portable-text";
 import { LocationIcon, ClockIcon } from "@/components/icons/category-icons";
 import { getEventBySlug } from "@/lib/sanity";
+import { generateIcsUrl } from "@/lib/calendar";
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -162,15 +164,13 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
                     )}
                   </div>
 
-                  {/* Description placeholder - would need Portable Text renderer */}
-                  {event.description && (
-                    <div className="prose prose-stone max-w-none">
+                  {/* Description */}
+                  {event.description && Array.isArray(event.description) && event.description.length > 0 && (
+                    <div>
                       <h2 className="text-lg font-semibold text-stone-800 mb-3">
                         About This Event
                       </h2>
-                      <p className="text-stone-600">
-                        Event details are available. Contact us for more information.
-                      </p>
+                      <PortableTextRenderer value={event.description} />
                     </div>
                   )}
 
@@ -244,8 +244,18 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
                           <p className="text-stone-600 text-sm mb-4">
                             No registration required. Just show up!
                           </p>
-                          <Button variant="secondary" className="w-full" size="lg">
-                            Add to Calendar
+                          <Button variant="secondary" className="w-full" size="lg" asChild>
+                            <a
+                              href={generateIcsUrl({
+                                title: event.title,
+                                startDateTime: event.startDateTime,
+                                endDateTime: event.endDateTime,
+                                location: event.location,
+                              })}
+                              download={`${event.slug || "event"}.ics`}
+                            >
+                              Add to Calendar
+                            </a>
                           </Button>
                         </>
                       )}

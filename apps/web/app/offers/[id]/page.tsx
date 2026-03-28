@@ -179,8 +179,8 @@ export default async function OfferDetailPage({ params }: OfferDetailPageProps) 
                     help facilitate the connection.
                   </p>
 
-                  <Button className="w-full" size="lg">
-                    Request This Help
+                  <Button className="w-full" size="lg" asChild>
+                    <Link href="/request-help">Request This Help</Link>
                   </Button>
 
                   <div className="mt-6 pt-6 border-t border-stone-100">

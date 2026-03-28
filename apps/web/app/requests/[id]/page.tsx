@@ -116,8 +116,8 @@ export default async function RequestDetailPage({ params }: RequestDetailPagePro
                       : "You can reach out directly to this neighbor."}
                   </p>
 
-                  <Button className="w-full" size="lg">
-                    I Can Help
+                  <Button className="w-full" size="lg" asChild>
+                    <Link href="/offer-help">I Can Help</Link>
                   </Button>
 
                   <p className="text-xs text-stone-400 text-center mt-4">

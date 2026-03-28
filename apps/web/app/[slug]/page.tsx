@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Container, Section } from "@/components/layout";
+import { PageBuilder } from "@/components/blocks";
 import { getPageBySlug, getAllPageSlugs } from "@/lib/sanity";
 
 interface DynamicPageProps {
@@ -75,27 +76,19 @@ export default async function DynamicPage({ params }: DynamicPageProps) {
       </Section>
 
       {/* Page Content */}
-      <Section spacing="lg">
-        <Container size="md">
-          {page.pageBuilder && page.pageBuilder.length > 0 ? (
-            <div className="prose prose-stone max-w-none">
-              <p className="text-stone-600">
-                This page has content blocks configured in Sanity Studio.
-                To render them fully, a Portable Text renderer would be integrated here.
-              </p>
-              <p className="text-sm text-stone-500 mt-4">
-                Page blocks: {page.pageBuilder.length}
-              </p>
-            </div>
-          ) : (
+      {page.pageBuilder && page.pageBuilder.length > 0 ? (
+        <PageBuilder blocks={page.pageBuilder} />
+      ) : (
+        <Section spacing="lg">
+          <Container size="md">
             <div className="text-center py-12">
               <p className="text-stone-500">
                 This page doesn&apos;t have any content yet.
               </p>
             </div>
-          )}
-        </Container>
-      </Section>
+          </Container>
+        </Section>
+      )}
     </>
   );
 }
