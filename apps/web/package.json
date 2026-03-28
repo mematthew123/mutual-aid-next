@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@portabletext/react": "^6.0.3",
     "@radix-ui/react-slot": "^1.2.4",
     "@sanity/client": "^7.14.1",
     "cloudinary": "^2.9.0",

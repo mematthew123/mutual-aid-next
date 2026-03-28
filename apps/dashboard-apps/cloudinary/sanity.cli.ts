@@ -5,4 +5,7 @@ export default defineCliConfig({
     organizationId: 'oXmvsz6A9',
     entry: './src/App.tsx',
   },
+  server: {
+    port: 3335,
+  },
 })

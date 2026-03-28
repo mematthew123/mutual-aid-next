@@ -14,6 +14,8 @@ cloudinary.config({
 const DEV_ORIGINS = [
   "http://localhost:3333",
   "http://localhost:3334",
+  "http://localhost:3335",
+  "http://localhost:3336",
   "http://localhost:5173",
 ];
 
