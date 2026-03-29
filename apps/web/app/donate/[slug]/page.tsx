@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Container, Section } from "@/components/layout";
 import { Button, Badge, Card, CardContent } from "@/components/ui";
 import { PortableTextRenderer } from "@/components/portable-text";
-import { sanityImageUrl } from "@/lib/sanity/image";
+import { resolveImageUrl } from "@/lib/sanity/image";
 import { getCampaignBySlug } from "@/lib/sanity";
 import { getSiteConfig } from "@/lib/site-config";
 
@@ -62,7 +62,7 @@ export default async function CampaignDetailPage({
   const current = campaign.goal?.currentAmount || 0;
   const progress = goal > 0 ? Math.min((current / goal) * 100, 100) : 0;
   const showProgress = campaign.goal?.showProgress && campaign.goal?.hasGoal;
-  const imageUrl = sanityImageUrl(campaign.image);
+  const imageUrl = resolveImageUrl(campaign.image as Record<string, unknown>);
 
   const donationLinks = campaign.donationLinks || {};
   const platforms = (

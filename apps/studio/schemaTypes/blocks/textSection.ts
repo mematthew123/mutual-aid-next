@@ -30,6 +30,7 @@ export const textSection = defineType({
             }),
           ],
         }),
+        defineArrayMember({type: 'cloudinaryImage'}),
       ],
     }),
     defineField({

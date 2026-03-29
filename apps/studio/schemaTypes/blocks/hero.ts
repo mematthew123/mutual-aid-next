@@ -22,11 +22,7 @@ export const hero = defineType({
     defineField({
       name: 'image',
       title: 'Background Image',
-      type: 'image',
-      options: {hotspot: true},
-      fields: [
-        defineField({name: 'alt', title: 'Alt Text', type: 'string'}),
-      ],
+      type: 'cloudinaryImage',
     }),
     defineField({
       name: 'ctas',
@@ -97,9 +93,9 @@ export const hero = defineType({
     }),
   ],
   preview: {
-    select: {title: 'heading', media: 'image'},
-    prepare({title, media}) {
-      return {title: title || 'Hero Section', subtitle: 'Hero', media}
+    select: {title: 'heading'},
+    prepare({title}) {
+      return {title: title || 'Hero Section', subtitle: 'Hero'}
     },
   },
 })

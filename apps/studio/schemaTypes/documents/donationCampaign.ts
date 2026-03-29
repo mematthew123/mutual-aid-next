@@ -44,15 +44,7 @@ export const donationCampaign = defineType({
     defineField({
       name: 'image',
       title: 'Campaign Image',
-      type: 'image',
-      options: {hotspot: true},
-      fields: [
-        defineField({
-          name: 'alt',
-          title: 'Alt Text',
-          type: 'string',
-        }),
-      ],
+      type: 'cloudinaryImage',
     }),
     defineField({
       name: 'goal',
@@ -232,14 +224,12 @@ export const donationCampaign = defineType({
       status: 'status',
       goal: 'goal.amount',
       current: 'goal.currentAmount',
-      media: 'image',
     },
-    prepare({title, status, goal, current, media}) {
+    prepare({title, status, goal, current}) {
       const progress = goal ? `$${current || 0} / $${goal}` : 'No goal set'
       return {
         title,
         subtitle: `${status} \u2022 ${progress}`,
-        media,
       }
     },
   },

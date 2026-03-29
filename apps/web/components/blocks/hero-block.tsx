@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Container, Section } from "@/components/layout";
 import { Button } from "@/components/ui";
-import { sanityImageUrl } from "@/lib/sanity/image";
+import { resolveImageUrl } from "@/lib/sanity/image";
 
 interface HeroCta {
   _key?: string;
@@ -15,7 +15,7 @@ interface HeroCta {
 interface HeroBlockProps {
   heading: string;
   subheading?: string;
-  image?: { asset?: { _ref?: string }; alt?: string };
+  image?: Record<string, unknown>;
   ctas?: HeroCta[];
   overlay?: boolean;
 }
@@ -33,7 +33,7 @@ export function HeroBlock({
   ctas,
   overlay = true,
 }: HeroBlockProps) {
-  const bgUrl = sanityImageUrl(image);
+  const bgUrl = resolveImageUrl(image);
 
   return (
     <Section spacing="xl" background="accent" className="relative overflow-hidden">
@@ -41,7 +41,7 @@ export function HeroBlock({
         <>
           <img
             src={bgUrl}
-            alt={image?.alt || ""}
+            alt={(image?.alt as string) || ""}
             className="absolute inset-0 size-full object-cover"
           />
           {overlay && (

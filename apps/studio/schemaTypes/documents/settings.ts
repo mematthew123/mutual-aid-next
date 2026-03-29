@@ -59,8 +59,7 @@ export const settings = defineType({
     defineField({
       name: 'logo',
       title: 'Logo',
-      type: 'image',
-      options: {hotspot: true},
+      type: 'cloudinaryImage',
       group: 'branding',
     }),
 
@@ -253,6 +252,6 @@ export const settings = defineType({
     }),
   ],
   preview: {
-    select: {title: 'title', media: 'logo'},
+    select: {title: 'title'},
   },
 })

@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LocationIcon, ClockIcon } from "@/components/icons/category-icons";
-import { sanityImageUrl } from "@/lib/sanity/image";
+import { resolveImageUrl } from "@/lib/sanity/image";
 import type { Event } from "@/lib/sanity/types";
 
 export interface EventCardProps extends HTMLAttributes<HTMLDivElement> {
@@ -65,7 +65,7 @@ const EventCard = forwardRef<HTMLDivElement, EventCardProps>(
         ? "Hybrid"
         : event.location?.venue || "In-Person";
 
-    const imageUrl = sanityImageUrl(event.image, { width: 600, height: 400, fit: "crop" });
+    const imageUrl = resolveImageUrl(event.image as Record<string, unknown>, { width: 600, height: 400, fit: "crop" });
 
     return (
       <Card

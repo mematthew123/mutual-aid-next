@@ -1,5 +1,33 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import type {CloudinaryProxyAsset} from '../types/cloudinary'
+
+const API_BASE = import.meta.env.SANITY_APP_API_URL || 'http://localhost:3000'
+const STUDIO_URL = import.meta.env.SANITY_APP_STUDIO_URL || 'http://localhost:3333'
+
+interface LinkedDocument {
+  _id: string
+  _type: string
+  title: string
+  slug?: string
+}
+
+const DOC_TYPE_LABELS: Record<string, string> = {
+  event: 'Event',
+  donationCampaign: 'Campaign',
+  communityResource: 'Resource',
+  teamMember: 'Team Member',
+  page: 'Page',
+  settings: 'Settings',
+}
+
+const DOC_TYPE_COLORS: Record<string, string> = {
+  event: 'bg-amber-100 text-amber-700',
+  donationCampaign: 'bg-green-100 text-green-700',
+  communityResource: 'bg-blue-100 text-blue-700',
+  teamMember: 'bg-purple-100 text-purple-700',
+  page: 'bg-gray-100 text-gray-600',
+  settings: 'bg-gray-100 text-gray-600',
+}
 
 interface AssetDetailPanelProps {
   asset: CloudinaryProxyAsset
@@ -58,8 +86,35 @@ function buildTransformUrl(
 
 export function AssetDetailPanel({asset, cloudName, onClose}: AssetDetailPanelProps) {
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
+  const [linkedDocs, setLinkedDocs] = useState<LinkedDocument[]>([])
+  const [linksLoading, setLinksLoading] = useState(false)
   const displayName = asset.public_id.split('/').pop() || asset.public_id
   const optimizedUrl = buildTransformUrl(cloudName, asset.public_id, asset.format, 'f_auto,q_auto')
+
+  // Fetch linked Sanity documents
+  useEffect(() => {
+    let cancelled = false
+    setLinksLoading(true)
+    setLinkedDocs([])
+
+    fetch(
+      `${API_BASE}/api/cloudinary?action=sanity-links&public_id=${encodeURIComponent(asset.public_id)}`,
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled) {
+          setLinkedDocs(data.documents || [])
+          setLinksLoading(false)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setLinksLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [asset.public_id])
 
   const copyUrl = async (url: string, key: string) => {
     try {
@@ -142,6 +197,50 @@ export function AssetDetailPanel({asset, cloudName, onClose}: AssetDetailPanelPr
                 </div>
               )}
             </dl>
+          </div>
+
+          {/* Used In — Linked Sanity Documents */}
+          <div className="mt-5 bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <h3 className="m-0 mb-3 text-sm font-semibold text-gray-700">
+              Used In
+            </h3>
+            {linksLoading ? (
+              <p className="m-0 text-xs text-gray-400">Loading...</p>
+            ) : linkedDocs.length === 0 ? (
+              <p className="m-0 text-xs text-gray-400">
+                Not used in any documents
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {linkedDocs.map((doc) => (
+                  <div
+                    key={doc._id}
+                    className="flex items-center justify-between gap-3 rounded-md border border-gray-200 bg-white px-3 py-2"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span
+                        className={`text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0 ${
+                          DOC_TYPE_COLORS[doc._type] || 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        {DOC_TYPE_LABELS[doc._type] || doc._type}
+                      </span>
+                      <span className="text-xs font-medium text-gray-700 truncate">
+                        {doc.title}
+                      </span>
+                    </div>
+                    <a
+                      href={`${STUDIO_URL}/intent/edit/id=${doc._id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-medium text-blue-600 hover:text-blue-700 shrink-0 no-underline"
+                    >
+                      Open in Studio &rarr;
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Copy URLs */}

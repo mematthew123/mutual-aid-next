@@ -29,8 +29,7 @@ export const teamMember = defineType({
     defineField({
       name: 'photo',
       title: 'Photo',
-      type: 'image',
-      options: {hotspot: true},
+      type: 'cloudinaryImage',
     }),
     defineField({
       name: 'bio',
@@ -81,14 +80,12 @@ export const teamMember = defineType({
     select: {
       title: 'name',
       subtitle: 'role',
-      media: 'photo',
       isActive: 'isActive',
     },
-    prepare({title, subtitle, media, isActive}) {
+    prepare({title, subtitle, isActive}) {
       return {
         title: `${isActive ? '' : '(Inactive) '}${title}`,
         subtitle,
-        media,
       }
     },
   },

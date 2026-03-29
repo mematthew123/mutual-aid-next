@@ -5,7 +5,7 @@ import { Button, Badge, Card, CardContent } from "@/components/ui";
 import { PortableTextRenderer } from "@/components/portable-text";
 import { LocationIcon, ClockIcon } from "@/components/icons/category-icons";
 import { getEventBySlug } from "@/lib/sanity";
-import { sanityImageUrl } from "@/lib/sanity/image";
+import { resolveImageUrl } from "@/lib/sanity/image";
 import { generateIcsUrl } from "@/lib/calendar";
 import { getSiteConfig } from "@/lib/site-config";
 
@@ -120,11 +120,11 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
                   </h1>
 
                   {/* Event Image */}
-                  {sanityImageUrl(event.image) && (
+                  {resolveImageUrl(event.image as Record<string, unknown>) && (
                     <div className="rounded-xl overflow-hidden mb-6">
                       <img
-                        src={sanityImageUrl(event.image)!}
-                        alt={event.image?.alt || event.title}
+                        src={resolveImageUrl(event.image as Record<string, unknown>)!}
+                        alt={(event.image as Record<string, unknown>)?.alt as string || event.title}
                         className="w-full object-cover"
                       />
                     </div>

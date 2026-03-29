@@ -1,10 +1,14 @@
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "51mpsx72";
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "";
 
 interface ImageTransformOptions {
   width?: number;
   height?: number;
   fit?: "clip" | "crop" | "fill" | "fillmax" | "max" | "scale" | "min";
+  gravity?: "auto" | "face" | "center";
+  quality?: "auto" | number;
+  format?: "auto" | "webp" | "avif" | "jpg" | "png";
 }
 
 /**
@@ -38,4 +42,85 @@ export function sanityImageUrl(
   }
 
   return url;
+}
+
+// Map from our generic fit values to Cloudinary crop modes
+const fitToCrop: Record<string, string> = {
+  crop: "c_crop",
+  fill: "c_fill",
+  scale: "c_scale",
+  clip: "c_limit",
+  fillmax: "c_fill",
+  max: "c_limit",
+  min: "c_lfill",
+};
+
+/**
+ * Build a Cloudinary delivery URL from stored metadata.
+ */
+export function cloudinaryImageUrl(
+  source:
+    | { public_id?: string; format?: string; version?: number }
+    | undefined,
+  options?: ImageTransformOptions
+): string | null {
+  const publicId = source?.public_id;
+  if (!publicId || !cloudName) return null;
+
+  const transforms: string[] = ["f_auto", "q_auto"];
+
+  if (options?.format && options.format !== "auto") {
+    transforms[0] = `f_${options.format}`;
+  }
+  if (options?.quality && options.quality !== "auto") {
+    transforms[1] = `q_${options.quality}`;
+  }
+  if (options?.width) {
+    transforms.push(`w_${options.width}`);
+  }
+  if (options?.height) {
+    transforms.push(`h_${options.height}`);
+  }
+  if (options?.fit) {
+    transforms.push(fitToCrop[options.fit] || "c_fill");
+  }
+  if (options?.gravity) {
+    transforms.push(`g_${options.gravity}`);
+  }
+
+  const transformStr = transforms.join(",");
+  const v = source?.version ? `v${source.version}/` : "";
+  const ext = source?.format || "jpg";
+
+  return `https://res.cloudinary.com/${cloudName}/image/upload/${transformStr}/${v}${publicId}.${ext}`;
+}
+
+/**
+ * Resolve an image URL from either a Cloudinary reference (public_id)
+ * or a legacy Sanity image reference (asset._ref). Supports both
+ * data shapes for backwards compatibility during migration.
+ */
+export function resolveImageUrl(
+  source: Record<string, unknown> | undefined,
+  options?: ImageTransformOptions
+): string | null {
+  if (!source) return null;
+
+  // New format: Cloudinary direct reference
+  if (source.public_id && typeof source.public_id === "string") {
+    return cloudinaryImageUrl(
+      source as { public_id: string; format?: string; version?: number },
+      options
+    );
+  }
+
+  // Legacy format: Sanity image asset reference
+  if (source.asset && typeof source.asset === "object") {
+    return sanityImageUrl(
+      source as { asset?: { _ref?: string } },
+      options
+    );
+  }
+
+  return null;
 }

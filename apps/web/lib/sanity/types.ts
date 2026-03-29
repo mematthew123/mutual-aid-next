@@ -1,5 +1,18 @@
 // Types matching Sanity schema definitions
 
+export interface CloudinaryImage {
+  _type?: "cloudinaryImage";
+  public_id?: string;
+  format?: string;
+  width?: number;
+  height?: number;
+  version?: number;
+  alt?: string;
+}
+
+/** Supports both new Cloudinary refs and legacy Sanity image refs */
+export type ImageField = CloudinaryImage | { asset?: { _ref: string }; alt?: string };
+
 export interface Category {
   _id: string;
   _type: "resourceCategory";
@@ -89,10 +102,7 @@ export interface Event {
   isRecurring?: boolean;
   recurrencePattern?: "weekly" | "biweekly" | "monthly" | "firstOfMonth" | "lastOfMonth";
   volunteersNeeded?: number;
-  image?: {
-    asset?: { _ref: string };
-    alt?: string;
-  };
+  image?: ImageField;
 }
 
 export interface CommunityResource {
@@ -118,9 +128,7 @@ export interface CommunityResource {
   isFeatured?: boolean;
   isVerified?: boolean;
   lastVerified?: string;
-  logo?: {
-    asset?: { _ref: string };
-  };
+  logo?: ImageField;
 }
 
 export interface DonationCampaign {
@@ -131,10 +139,7 @@ export interface DonationCampaign {
   slug: string; // Projected as string in queries
   campaignType?: "general" | "emergency" | "specific" | "recurring";
   description?: unknown[]; // Portable Text blocks
-  image?: {
-    asset?: { _ref: string };
-    alt?: string;
-  };
+  image?: ImageField;
   goal?: {
     hasGoal?: boolean;
     amount?: number;
@@ -177,9 +182,7 @@ export interface TeamMember {
   role?: string;
   bio?: string;
   email?: string;
-  photo?: {
-    asset?: { _ref: string };
-  };
+  photo?: ImageField;
 }
 
 export interface Page {
@@ -192,7 +195,7 @@ export interface Page {
   seo?: {
     metaTitle?: string;
     metaDescription?: string;
-    ogImage?: { asset?: { _ref: string } };
+    ogImage?: ImageField;
   };
 }
 
@@ -204,9 +207,7 @@ export interface Settings {
   tagline?: string;
   description?: string;
   footerNote?: string;
-  logo?: {
-    asset?: { _ref: string };
-  };
+  logo?: ImageField;
   hero?: {
     badge?: string;
     heading?: string;

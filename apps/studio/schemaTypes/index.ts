@@ -11,6 +11,7 @@ import {donationCampaign} from './documents/donationCampaign'
 
 // Objects
 import {seo} from './objects/seo'
+import {cloudinaryImage} from './objects/cloudinaryImage'
 
 // Page Builder Blocks
 import {hero} from './blocks/hero'
@@ -36,6 +37,7 @@ export const schemaTypes = [
 
   // Objects
   seo,
+  cloudinaryImage,
 
   // Page Builder Blocks
   hero,

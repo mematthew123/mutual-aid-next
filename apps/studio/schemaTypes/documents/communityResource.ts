@@ -38,8 +38,7 @@ export const communityResource = defineType({
     defineField({
       name: 'logo',
       title: 'Logo',
-      type: 'image',
-      options: {hotspot: true},
+      type: 'cloudinaryImage',
     }),
     defineField({
       name: 'contact',
@@ -148,13 +147,11 @@ export const communityResource = defineType({
       title: 'name',
       category: 'categories.0.title',
       verified: 'isVerified',
-      media: 'logo',
     },
-    prepare({title, category, verified, media}) {
+    prepare({title, category, verified}) {
       return {
         title: `${verified ? '\u2705 ' : ''}${title}`,
         subtitle: category || 'Uncategorized',
-        media,
       }
     },
   },

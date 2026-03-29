@@ -3,7 +3,7 @@ import {
   type PortableTextComponents,
   type PortableTextBlock,
 } from "@portabletext/react";
-import { sanityImageUrl } from "@/lib/sanity/image";
+import { resolveImageUrl } from "@/lib/sanity/image";
 
 const components: PortableTextComponents = {
   block: {
@@ -67,7 +67,7 @@ const components: PortableTextComponents = {
   },
   types: {
     image: ({ value }) => {
-      const url = sanityImageUrl(value);
+      const url = resolveImageUrl(value);
       if (!url) return null;
       return (
         <figure className="my-6">
@@ -81,6 +81,19 @@ const components: PortableTextComponents = {
               {value.caption}
             </figcaption>
           )}
+        </figure>
+      );
+    },
+    cloudinaryImage: ({ value }) => {
+      const url = resolveImageUrl(value);
+      if (!url) return null;
+      return (
+        <figure className="my-6">
+          <img
+            src={url}
+            alt={value?.alt || ""}
+            className="w-full rounded-xl"
+          />
         </figure>
       );
     },

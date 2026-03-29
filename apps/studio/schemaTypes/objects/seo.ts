@@ -23,7 +23,7 @@ export const seo = defineType({
     defineField({
       name: 'image',
       title: 'Social Share Image',
-      type: 'image',
+      type: 'cloudinaryImage',
       description: 'Image shown when shared on social media (1200x630 recommended)',
     }),
     defineField({

@@ -47,15 +47,7 @@ export const event = defineType({
     defineField({
       name: 'image',
       title: 'Event Image',
-      type: 'image',
-      options: {hotspot: true},
-      fields: [
-        defineField({
-          name: 'alt',
-          title: 'Alt Text',
-          type: 'string',
-        }),
-      ],
+      type: 'cloudinaryImage',
     }),
     defineField({
       name: 'startDateTime',
@@ -240,14 +232,12 @@ export const event = defineType({
       date: 'startDateTime',
       eventType: 'eventType',
       status: 'status',
-      media: 'image',
     },
-    prepare({title, date, eventType, status, media}) {
+    prepare({title, date, eventType, status}) {
       const formattedDate = date ? new Date(date).toLocaleDateString() : 'No date'
       return {
         title,
         subtitle: `${eventType || 'event'} \u2022 ${formattedDate} \u2022 ${status}`,
-        media,
       }
     },
   },

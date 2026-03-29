@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { sanityImageUrl } from "@/lib/sanity/image";
+import { resolveImageUrl } from "@/lib/sanity/image";
 import type { DonationCampaign } from "@/lib/sanity/types";
 
 export interface CampaignCardProps extends HTMLAttributes<HTMLDivElement> {
@@ -26,7 +26,7 @@ const CampaignCard = forwardRef<HTMLDivElement, CampaignCardProps>(
     const current = campaign.goal?.currentAmount || 0;
     const progress = goal > 0 ? Math.min((current / goal) * 100, 100) : 0;
     const showProgress = campaign.goal?.showProgress && campaign.goal?.hasGoal;
-    const imageUrl = sanityImageUrl(campaign.image, { width: 600, height: 400, fit: "crop" });
+    const imageUrl = resolveImageUrl(campaign.image as Record<string, unknown>, { width: 600, height: 400, fit: "crop" });
 
     return (
       <Card

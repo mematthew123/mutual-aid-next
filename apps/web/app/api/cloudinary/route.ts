@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
+import { client } from "@/lib/sanity/client";
 
 // Configure Cloudinary SDK at module scope (server-side only)
 cloudinary.config({
@@ -119,6 +120,40 @@ export async function GET(request: NextRequest) {
           derived_resources: result.derived_resources ?? 0,
           plan: result.plan ?? "unknown",
         },
+        { headers: corsHeaders(origin) }
+      );
+    }
+
+    // -----------------------------------------------------------------------
+    // action=sanity-links — find Sanity documents referencing a Cloudinary asset
+    // -----------------------------------------------------------------------
+    if (action === "sanity-links") {
+      const publicId = searchParams.get("public_id");
+      if (!publicId) {
+        return NextResponse.json(
+          { error: "public_id parameter is required" },
+          { status: 400, headers: corsHeaders(origin) }
+        );
+      }
+
+      const documents = await client.fetch(
+        `*[
+          image.public_id == $pid ||
+          logo.public_id == $pid ||
+          photo.public_id == $pid ||
+          seo.image.public_id == $pid ||
+          count(pageBuilder[image.public_id == $pid || public_id == $pid]) > 0
+        ]{
+          _id,
+          _type,
+          "title": coalesce(title, name),
+          "slug": slug.current
+        }`,
+        { pid: publicId }
+      );
+
+      return NextResponse.json(
+        { documents: documents ?? [] },
         { headers: corsHeaders(origin) }
       );
     }
