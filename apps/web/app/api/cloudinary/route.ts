@@ -75,16 +75,66 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = request.nextUrl;
-  const query = searchParams.get("q") || "";
-  const folder = searchParams.get("folder") || "";
-  const tag = searchParams.get("tag") || "";
-  const cursor = searchParams.get("cursor") || undefined;
-  const maxResults = Math.min(
-    Number(searchParams.get("max_results")) || 30,
-    100
-  );
+  const action = searchParams.get("action") || "list";
 
   try {
+    // -----------------------------------------------------------------------
+    // action=tags — list all tags
+    // -----------------------------------------------------------------------
+    if (action === "tags") {
+      const result = await cloudinary.api.tags({ max_results: 500 });
+      return NextResponse.json(
+        { tags: result.tags ?? [] },
+        { headers: corsHeaders(origin) }
+      );
+    }
+
+    // -----------------------------------------------------------------------
+    // action=folders — list root folders
+    // -----------------------------------------------------------------------
+    if (action === "folders") {
+      const result = await cloudinary.api.root_folders();
+      return NextResponse.json(
+        { folders: result.folders ?? [] },
+        { headers: corsHeaders(origin) }
+      );
+    }
+
+    // -----------------------------------------------------------------------
+    // action=usage — account usage stats
+    // -----------------------------------------------------------------------
+    if (action === "usage") {
+      const result = await cloudinary.api.usage();
+      return NextResponse.json(
+        {
+          storage: {
+            used: result.storage?.usage ?? 0,
+            limit: result.storage?.limit ?? 0,
+          },
+          bandwidth: {
+            used: result.bandwidth?.usage ?? 0,
+            limit: result.bandwidth?.limit ?? 0,
+          },
+          resources: result.resources ?? 0,
+          derived_resources: result.derived_resources ?? 0,
+          plan: result.plan ?? "unknown",
+        },
+        { headers: corsHeaders(origin) }
+      );
+    }
+
+    // -----------------------------------------------------------------------
+    // Default: list & search assets
+    // -----------------------------------------------------------------------
+    const query = searchParams.get("q") || "";
+    const folder = searchParams.get("folder") || "";
+    const tag = searchParams.get("tag") || "";
+    const cursor = searchParams.get("cursor") || undefined;
+    const maxResults = Math.min(
+      Number(searchParams.get("max_results")) || 30,
+      100
+    );
+
     let result: { resources: CloudinaryResource[]; next_cursor?: string; total_count?: number };
 
     if (query || folder || tag) {

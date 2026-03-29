@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { sanityImageUrl } from "@/lib/sanity/image";
 import type { DonationCampaign } from "@/lib/sanity/types";
 
 export interface CampaignCardProps extends HTMLAttributes<HTMLDivElement> {
@@ -25,6 +26,7 @@ const CampaignCard = forwardRef<HTMLDivElement, CampaignCardProps>(
     const current = campaign.goal?.currentAmount || 0;
     const progress = goal > 0 ? Math.min((current / goal) * 100, 100) : 0;
     const showProgress = campaign.goal?.showProgress && campaign.goal?.hasGoal;
+    const imageUrl = sanityImageUrl(campaign.image, { width: 600, height: 400, fit: "crop" });
 
     return (
       <Card
@@ -36,6 +38,17 @@ const CampaignCard = forwardRef<HTMLDivElement, CampaignCardProps>(
         )}
         {...props}
       >
+        {/* Campaign Image */}
+        {imageUrl && (
+          <div className="w-full h-48 overflow-hidden">
+            <img
+              src={imageUrl}
+              alt={campaign.image?.alt || campaign.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+
         <CardContent className="pt-6">
           {/* Type & Status */}
           <div className="flex items-start justify-between gap-4 mb-3">
@@ -65,7 +78,7 @@ const CampaignCard = forwardRef<HTMLDivElement, CampaignCardProps>(
           {showProgress && (
             <div className="mb-4">
               <div className="flex justify-between text-sm mb-1">
-                <span className="font-medium text-forest-600">
+                <span className="font-medium text-wheat-600">
                   ${current.toLocaleString()}
                 </span>
                 <span className="text-stone-500">
@@ -74,7 +87,7 @@ const CampaignCard = forwardRef<HTMLDivElement, CampaignCardProps>(
               </div>
               <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-forest-500 rounded-full transition-all"
+                  className="h-full bg-wheat-500 rounded-full transition-all"
                   style={{ width: `${progress}%` }}
                 />
               </div>

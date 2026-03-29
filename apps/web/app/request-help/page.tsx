@@ -1,17 +1,19 @@
 import { Container, Section } from "@/components/layout";
 import { Card, CardContent } from "@/components/ui";
 import { getCategories, getUniqueNeighborhoods } from "@/lib/sanity";
+import { getSiteConfig, defaults as siteConfigDefaults } from "@/lib/site-config";
 import { RequestHelpForm } from "./request-help-form";
 
 export const metadata = {
-  title: "Request Help | Mutual Aid Network",
-  description: "Submit a request for help from your community. Our neighbors are here to support you.",
+  title: `${siteConfigDefaults.pages.requestHelp.title} | ${siteConfigDefaults.name}`,
+  description: `Submit a request for help from your community. ${siteConfigDefaults.terms.members} are here to support you.`,
 };
 
 export default async function RequestHelpPage() {
-  const [categories, neighborhoods] = await Promise.all([
+  const [categories, neighborhoods, siteConfig] = await Promise.all([
     getCategories(),
     getUniqueNeighborhoods(),
+    getSiteConfig(),
   ]);
 
   return (
@@ -21,11 +23,10 @@ export default async function RequestHelpPage() {
         <Container size="md">
           <div className="text-center">
             <h1 className="text-3xl sm:text-4xl font-bold text-stone-800">
-              Request Help
+              {siteConfig.pages.requestHelp.title}
             </h1>
             <p className="mt-3 text-stone-600 text-lg max-w-xl mx-auto">
-              Let us know what you need. Our community is here to support you,
-              and your privacy is always protected.
+              {siteConfig.pages.requestHelp.description}
             </p>
           </div>
         </Container>

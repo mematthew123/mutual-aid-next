@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getCategoryIcon, LocationIcon } from "@/components/icons/category-icons";
+import { sanityImageUrl } from "@/lib/sanity/image";
 import type { CommunityResource } from "@/lib/sanity/types";
 
 export interface ResourceCardProps extends Omit<HTMLAttributes<HTMLDivElement>, "resource"> {
@@ -38,10 +39,19 @@ const ResourceCard = forwardRef<HTMLDivElement, ResourceCardProps>(
             </div>
           </div>
 
-          {/* Name */}
-          <h3 className="text-lg font-semibold text-stone-800 mb-2">
-            {resource.name}
-          </h3>
+          {/* Name + Logo */}
+          <div className="flex items-center gap-3 mb-2">
+            {sanityImageUrl(resource.logo) && (
+              <img
+                src={sanityImageUrl(resource.logo, { width: 96, height: 96, fit: "crop" })!}
+                alt={resource.name}
+                className="size-12 rounded-lg object-cover shrink-0"
+              />
+            )}
+            <h3 className="text-lg font-semibold text-stone-800">
+              {resource.name}
+            </h3>
+          </div>
 
           {/* Description */}
           {resource.description && (

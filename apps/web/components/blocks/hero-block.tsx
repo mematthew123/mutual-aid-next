@@ -20,8 +20,8 @@ interface HeroBlockProps {
   overlay?: boolean;
 }
 
-const styleToVariant: Record<string, "default" | "secondary" | "outline"> = {
-  primary: "default",
+const styleToVariant: Record<string, "primary" | "secondary" | "outline"> = {
+  primary: "primary",
   secondary: "secondary",
   outline: "outline",
 };

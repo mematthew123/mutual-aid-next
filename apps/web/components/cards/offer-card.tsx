@@ -44,8 +44,8 @@ const OfferCard = forwardRef<HTMLDivElement, OfferCardProps>(
         ref={ref}
         className={cn(
           "relative overflow-hidden",
-          // Left border accent - always forest green for offers
-          "border-l-4 border-l-forest-400",
+          // Left border accent - warm wheat for offers (contrast with request urgency colors)
+          "border-l-4 border-l-wheat-400",
           className
         )}
         {...props}
@@ -53,8 +53,8 @@ const OfferCard = forwardRef<HTMLDivElement, OfferCardProps>(
         <CardContent className="pt-6">
           {/* Header: Heart icon + offer type */}
           <div className="flex items-start justify-between gap-4 mb-3">
-            <div className="flex items-center gap-2 text-forest-600">
-              <HeartIcon className="size-5 fill-forest-100" />
+            <div className="flex items-center gap-2 text-wheat-600">
+              <HeartIcon className="size-5 fill-wheat-100" />
               <span className="text-sm font-medium">Offering Help</span>
             </div>
 

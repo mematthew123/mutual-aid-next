@@ -3,14 +3,18 @@ import { EmptyState } from "@/components/ui";
 import { CampaignCard } from "@/components/cards";
 import { HeartIcon } from "@/components/icons/category-icons";
 import { getActiveCampaigns } from "@/lib/sanity";
+import { getSiteConfig, defaults as siteConfigDefaults } from "@/lib/site-config";
 
 export const metadata = {
-  title: "Donate | Mutual Aid Network",
-  description: "Support your community through donations to our active campaigns and general fund.",
+  title: `Donate | ${siteConfigDefaults.name}`,
+  description: siteConfigDefaults.pages.donate.description,
 };
 
 export default async function DonatePage() {
-  const campaigns = await getActiveCampaigns();
+  const [campaigns, siteConfig] = await Promise.all([
+    getActiveCampaigns(),
+    getSiteConfig(),
+  ]);
 
   const featuredCampaigns = campaigns.filter((c) => c.isFeatured);
   const otherCampaigns = campaigns.filter((c) => !c.isFeatured);
@@ -22,11 +26,10 @@ export default async function DonatePage() {
         <Container>
           <div className="text-center">
             <h1 className="text-3xl sm:text-4xl font-bold text-stone-800">
-              Support Your Community
+              {siteConfig.pages.donate.title}
             </h1>
             <p className="mt-3 text-stone-600 text-lg max-w-xl mx-auto">
-              Your donations help us provide direct support to neighbors in need.
-              Every contribution makes a difference.
+              {siteConfig.pages.donate.description}
             </p>
           </div>
         </Container>
@@ -84,13 +87,13 @@ export default async function DonatePage() {
             <div className="grid sm:grid-cols-2 gap-4 max-w-lg mx-auto">
               <a
                 href="/offer-help"
-                className="p-4 rounded-xl bg-forest-50 text-forest-700 font-medium hover:bg-forest-100 transition-colors"
+                className="p-4 rounded-xl bg-terracotta-50 text-terracotta-700 font-medium hover:bg-terracotta-100 transition-colors"
               >
                 Volunteer Your Time
               </a>
               <a
                 href="/resources"
-                className="p-4 rounded-xl bg-sage-50 text-sage-700 font-medium hover:bg-sage-100 transition-colors"
+                className="p-4 rounded-xl bg-wheat-50 text-wheat-700 font-medium hover:bg-wheat-100 transition-colors"
               >
                 Share Resources
               </a>

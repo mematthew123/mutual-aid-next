@@ -157,7 +157,7 @@ export function RequestHelpForm({ categories, neighborhoods }: RequestHelpFormPr
           Request Submitted!
         </h2>
         <p className="text-stone-600">
-          Thank you for reaching out. A coordinator will review your request soon.
+          Thank you for reaching out. An organizer will review your request soon.
         </p>
       </div>
     );
@@ -233,7 +233,7 @@ export function RequestHelpForm({ categories, neighborhoods }: RequestHelpFormPr
       <FormField
         label="Neighborhood"
         htmlFor="neighborhood"
-        description="This helps us connect you with nearby neighbors."
+        description="This helps us connect you with nearby community members."
       >
         <Select
           id="neighborhood"
@@ -257,13 +257,13 @@ export function RequestHelpForm({ categories, neighborhoods }: RequestHelpFormPr
         >
           <RadioGroupItem
             value="throughCoordinator"
-            label="Through a coordinator"
-            description="A trusted volunteer will facilitate the connection"
+            label="Through an organizer"
+            description="A trusted team member will facilitate the connection"
           />
           <RadioGroupItem
             value="direct"
             label="Direct contact"
-            description="Volunteers can reach out to you directly"
+            description="Community members can reach out to you directly"
           />
           <RadioGroupItem
             value="anonymous"
@@ -297,7 +297,7 @@ export function RequestHelpForm({ categories, neighborhoods }: RequestHelpFormPr
 
       {/* Privacy Note */}
       <p className="text-sm text-stone-500 text-center">
-        Your request will be reviewed by a coordinator before being posted publicly.
+        Your request will be reviewed by an organizer before being posted publicly.
         We never share your personal information without your consent.
       </p>
     </form>

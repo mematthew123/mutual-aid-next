@@ -5,7 +5,9 @@ import { Button, Badge, Card, CardContent } from "@/components/ui";
 import { PortableTextRenderer } from "@/components/portable-text";
 import { LocationIcon, ClockIcon } from "@/components/icons/category-icons";
 import { getEventBySlug } from "@/lib/sanity";
+import { sanityImageUrl } from "@/lib/sanity/image";
 import { generateIcsUrl } from "@/lib/calendar";
+import { getSiteConfig } from "@/lib/site-config";
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -13,14 +15,17 @@ interface EventDetailPageProps {
 
 export async function generateMetadata({ params }: EventDetailPageProps) {
   const { slug } = await params;
-  const event = await getEventBySlug(slug);
+  const [event, siteConfig] = await Promise.all([
+    getEventBySlug(slug),
+    getSiteConfig(),
+  ]);
 
   if (!event) {
     return { title: "Event Not Found" };
   }
 
   return {
-    title: `${event.title} | Mutual Aid Network`,
+    title: `${event.title} | ${siteConfig.name}`,
     description: `Join us for ${event.title} on ${new Date(event.startDateTime).toLocaleDateString()}`,
   };
 }
@@ -37,7 +42,10 @@ const eventTypeLabels: Record<string, string> = {
 
 export default async function EventDetailPage({ params }: EventDetailPageProps) {
   const { slug } = await params;
-  const event = await getEventBySlug(slug);
+  const [event, siteConfig] = await Promise.all([
+    getEventBySlug(slug),
+    getSiteConfig(),
+  ]);
 
   if (!event) {
     notFound();
@@ -111,9 +119,20 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
                     {event.title}
                   </h1>
 
+                  {/* Event Image */}
+                  {sanityImageUrl(event.image) && (
+                    <div className="rounded-xl overflow-hidden mb-6">
+                      <img
+                        src={sanityImageUrl(event.image)!}
+                        alt={event.image?.alt || event.title}
+                        className="w-full object-cover"
+                      />
+                    </div>
+                  )}
+
                   {/* Date & Time */}
-                  <div className="flex items-start gap-4 p-4 rounded-xl bg-forest-50 mb-6">
-                    <div className="flex flex-col items-center justify-center size-16 rounded-lg bg-white text-forest-700 shadow-sm">
+                  <div className="flex items-start gap-4 p-4 rounded-xl bg-terracotta-50 mb-6">
+                    <div className="flex flex-col items-center justify-center size-16 rounded-lg bg-white text-terracotta-700 shadow-sm">
                       <span className="text-sm font-medium uppercase">
                         {startDate.toLocaleDateString("en-US", { month: "short" })}
                       </span>
@@ -128,7 +147,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
                         {endTime && ` - ${endTime}`}
                       </p>
                       {event.recurrencePattern && (
-                        <p className="text-sm text-forest-600 mt-1">
+                        <p className="text-sm text-terracotta-600 mt-1">
                           Repeats {event.recurrencePattern}
                         </p>
                       )}
@@ -181,7 +200,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
                         Volunteers Needed: {event.volunteersNeeded}
                       </p>
                       <p className="text-sm text-amber-700 mt-1">
-                        We&apos;re looking for volunteers to help with this event.
+                        We&apos;re looking for {siteConfig.terms.helpers} for this event.
                       </p>
                     </div>
                   )}

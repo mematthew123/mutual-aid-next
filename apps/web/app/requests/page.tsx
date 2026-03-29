@@ -10,6 +10,7 @@ import {
   getCategories,
   getUniqueNeighborhoods,
 } from "@/lib/sanity";
+import { getSiteConfig, defaults as siteConfigDefaults } from "@/lib/site-config";
 import type { RequestFilters } from "@/lib/sanity/types";
 
 interface RequestsPageProps {
@@ -21,8 +22,8 @@ interface RequestsPageProps {
 }
 
 export const metadata = {
-  title: "Current Requests | Mutual Aid Network",
-  description: "Browse open requests from neighbors who need help in your community.",
+  title: `${siteConfigDefaults.pages.requests.title} | ${siteConfigDefaults.name}`,
+  description: `Browse open requests from ${siteConfigDefaults.terms.members} who need help in your community.`,
 };
 
 async function RequestsList({ filters }: { filters: RequestFilters }) {
@@ -32,8 +33,8 @@ async function RequestsList({ filters }: { filters: RequestFilters }) {
     return (
       <EmptyState
         icon={<HeartIcon className="size-12 text-stone-300" />}
-        title="No requests match your filters"
-        description="Try adjusting your filters or check back soon for new requests."
+        title={siteConfigDefaults.pages.requests.emptyTitle}
+        description={siteConfigDefaults.pages.requests.emptyDescription}
         action={{
           label: "View All Requests",
           href: "/requests",
@@ -66,9 +67,10 @@ function RequestsListSkeleton() {
 
 export default async function RequestsPage({ searchParams }: RequestsPageProps) {
   const params = await searchParams;
-  const [categories, neighborhoods] = await Promise.all([
+  const [categories, neighborhoods, siteConfig] = await Promise.all([
     getCategories(),
     getUniqueNeighborhoods(),
+    getSiteConfig(),
   ]);
 
   const filters: RequestFilters = {
@@ -85,10 +87,10 @@ export default async function RequestsPage({ searchParams }: RequestsPageProps) 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold text-stone-800">
-                Current Requests
+                {siteConfig.pages.requests.title}
               </h1>
               <p className="mt-2 text-stone-600 text-lg">
-                Neighbors who could use your help right now
+                {siteConfig.pages.requests.description}
               </p>
             </div>
             <Button asChild>
@@ -125,10 +127,10 @@ export default async function RequestsPage({ searchParams }: RequestsPageProps) 
         <Container size="md">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-stone-800">
-              Need help yourself?
+              {siteConfig.pages.requests.ctaTitle}
             </h2>
             <p className="mt-3 text-stone-600">
-              Don&apos;t hesitate to reach out. Our community is here to support you.
+              {siteConfig.pages.requests.ctaDescription}
             </p>
             <div className="mt-6">
               <Button size="lg" asChild>

@@ -197,10 +197,10 @@ export function OfferHelpForm({ categories, neighborhoods }: OfferHelpFormProps)
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-stone-800 mb-2">
-          Thank You for Volunteering!
+          Thank You for Helping!
         </h2>
         <p className="text-stone-600">
-          Your offer has been submitted. A coordinator will review it soon.
+          Your offer has been submitted. An organizer will review it soon.
         </p>
       </div>
     );
@@ -323,7 +323,7 @@ export function OfferHelpForm({ categories, neighborhoods }: OfferHelpFormProps)
       <FormField
         label="Neighborhood"
         htmlFor="neighborhood"
-        description="This helps us connect you with nearby requests."
+        description="This helps us connect you with nearby community members."
       >
         <Select
           id="neighborhood"
@@ -375,7 +375,7 @@ export function OfferHelpForm({ categories, neighborhoods }: OfferHelpFormProps)
 
       {/* Privacy Note */}
       <p className="text-sm text-stone-500 text-center">
-        Your offer will be reviewed by a coordinator before being posted publicly.
+        Your offer will be reviewed by an organizer before being posted publicly.
         We&apos;ll only share your contact information with matched requesters.
       </p>
     </form>

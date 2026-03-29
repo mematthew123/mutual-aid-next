@@ -10,6 +10,7 @@ import {
   getCategories,
   getUniqueNeighborhoods,
 } from "@/lib/sanity";
+import { getSiteConfig, defaults as siteConfigDefaults } from "@/lib/site-config";
 import type { OfferFilters } from "@/lib/sanity/types";
 
 interface OffersPageProps {
@@ -20,8 +21,8 @@ interface OffersPageProps {
 }
 
 export const metadata = {
-  title: "Available Help | Mutual Aid Network",
-  description: "Browse offers from neighbors ready to help in your community.",
+  title: `${siteConfigDefaults.pages.offers.title} | ${siteConfigDefaults.name}`,
+  description: `Browse offers from ${siteConfigDefaults.terms.members} ready to help in your community.`,
 };
 
 async function OffersList({ filters }: { filters: OfferFilters }) {
@@ -31,8 +32,8 @@ async function OffersList({ filters }: { filters: OfferFilters }) {
     return (
       <EmptyState
         icon={<HeartIcon className="size-12 text-stone-300" />}
-        title="No offers match your filters"
-        description="Try adjusting your filters or check back soon for new offers."
+        title={siteConfigDefaults.pages.offers.emptyTitle}
+        description={siteConfigDefaults.pages.offers.emptyDescription}
         action={{
           label: "View All Offers",
           href: "/offers",
@@ -65,9 +66,10 @@ function OffersListSkeleton() {
 
 export default async function OffersPage({ searchParams }: OffersPageProps) {
   const params = await searchParams;
-  const [categories, neighborhoods] = await Promise.all([
+  const [categories, neighborhoods, siteConfig] = await Promise.all([
     getCategories(),
     getUniqueNeighborhoods(),
+    getSiteConfig(),
   ]);
 
   const filters: OfferFilters = {
@@ -83,10 +85,10 @@ export default async function OffersPage({ searchParams }: OffersPageProps) {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold text-stone-800">
-                Available Help
+                {siteConfig.pages.offers.title}
               </h1>
               <p className="mt-2 text-stone-600 text-lg">
-                Neighbors ready to lend a hand
+                {siteConfig.pages.offers.description}
               </p>
             </div>
             <Button asChild>
@@ -123,14 +125,14 @@ export default async function OffersPage({ searchParams }: OffersPageProps) {
         <Container size="md">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-stone-800">
-              Want to help your neighbors?
+              {siteConfig.pages.offers.ctaTitle}
             </h2>
             <p className="mt-3 text-stone-600">
-              Share your skills, time, or resources with those who need them most.
+              {siteConfig.pages.offers.ctaDescription}
             </p>
             <div className="mt-6">
               <Button size="lg" asChild>
-                <Link href="/offer-help">Start Volunteering</Link>
+                <Link href="/offer-help">Start {siteConfig.terms.helping}</Link>
               </Button>
             </div>
           </div>

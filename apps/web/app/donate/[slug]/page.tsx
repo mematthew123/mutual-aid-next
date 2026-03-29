@@ -5,6 +5,7 @@ import { Button, Badge, Card, CardContent } from "@/components/ui";
 import { PortableTextRenderer } from "@/components/portable-text";
 import { sanityImageUrl } from "@/lib/sanity/image";
 import { getCampaignBySlug } from "@/lib/sanity";
+import { getSiteConfig } from "@/lib/site-config";
 
 interface CampaignDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -12,14 +13,17 @@ interface CampaignDetailPageProps {
 
 export async function generateMetadata({ params }: CampaignDetailPageProps) {
   const { slug } = await params;
-  const campaign = await getCampaignBySlug(slug);
+  const [campaign, siteConfig] = await Promise.all([
+    getCampaignBySlug(slug),
+    getSiteConfig(),
+  ]);
 
   if (!campaign) {
     return { title: "Campaign Not Found" };
   }
 
   return {
-    title: `${campaign.title} | Mutual Aid Network`,
+    title: `${campaign.title} | ${siteConfig.name}`,
     description: `Support ${campaign.title} — donate to help our community.`,
   };
 }
@@ -127,9 +131,9 @@ export default async function CampaignDetailPage({
 
                   {/* Progress Bar */}
                   {showProgress && (
-                    <div className="mb-6 p-4 rounded-xl bg-forest-50">
+                    <div className="mb-6 p-4 rounded-xl bg-wheat-50">
                       <div className="flex justify-between text-sm mb-2">
-                        <span className="font-semibold text-forest-700 text-lg">
+                        <span className="font-semibold text-wheat-700 text-lg">
                           ${current.toLocaleString()}
                         </span>
                         <span className="text-stone-500">
@@ -138,7 +142,7 @@ export default async function CampaignDetailPage({
                       </div>
                       <div className="h-3 bg-white rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-forest-500 rounded-full transition-all"
+                          className="h-full bg-wheat-500 rounded-full transition-all"
                           style={{ width: `${progress}%` }}
                         />
                       </div>
@@ -266,7 +270,7 @@ export default async function CampaignDetailPage({
                           {campaign.donationOptions.map((option, i) => (
                             <div
                               key={i}
-                              className="text-center py-2 px-3 rounded-lg bg-forest-50 text-forest-700 text-sm font-medium"
+                              className="text-center py-2 px-3 rounded-lg bg-wheat-50 text-wheat-700 text-sm font-medium"
                             >
                               {option.label || `$${option.amount}`}
                             </div>

@@ -7,9 +7,36 @@ import type {
   CommunityResource,
   DonationCampaign,
   Page,
+  Settings,
   RequestFilters,
   OfferFilters,
 } from "./types";
+
+// ============================================================================
+// Settings (singleton)
+// ============================================================================
+
+export async function getSettings(): Promise<Settings | null> {
+  return client.fetch(
+    `*[_type == "settings"][0]{
+      _id,
+      _type,
+      title,
+      shortName,
+      tagline,
+      description,
+      footerNote,
+      logo { asset },
+      hero,
+      cta,
+      terminology,
+      impactStats[]{ label, value },
+      contact,
+      social,
+      serviceArea
+    }`
+  );
+}
 
 // Category projection for expansion
 // Note: keeps slug as object { current } to match component expectations
@@ -177,7 +204,8 @@ const eventProjection = `{
   registrationRequired,
   maxAttendees,
   isRecurring,
-  recurringPattern
+  recurringPattern,
+  image { asset, alt }
 }`;
 
 export async function getUpcomingEvents(limit: number = 5): Promise<Event[]> {
@@ -238,7 +266,8 @@ const resourceProjection = `{
   serviceArea,
   isFeatured,
   isVerified,
-  lastVerified
+  lastVerified,
+  logo { asset }
 }`;
 
 export async function getAllResources(): Promise<CommunityResource[]> {
@@ -327,7 +356,7 @@ const pageProjection = `{
     },
     _type == "teamSection" => {
       ...,
-      "teamMembers": teamMembers[]->{ _id, name, role, bio, email }
+      "teamMembers": teamMembers[]->{ _id, name, role, bio, email, photo { asset } }
     }
   },
   seo

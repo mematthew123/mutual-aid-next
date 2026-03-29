@@ -6,15 +6,13 @@ import { cn } from "@/lib/utils";
 import { Container } from "./container";
 import { Button } from "@/components/ui/button";
 import { HeartIcon } from "@/components/icons/category-icons";
+import type { SiteConfig } from "@/lib/site-config-types";
 
-const navigation = [
-  { name: "Get Help", href: "/requests" },
-  { name: "Offer Help", href: "/offers" },
-  { name: "Events", href: "/events" },
-  { name: "Resources", href: "/resources" },
-];
+interface HeaderProps {
+  config: SiteConfig;
+}
 
-export function Header() {
+export function Header({ config }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -27,13 +25,13 @@ export function Header() {
               <HeartIcon className="size-5 text-white" />
             </div>
             <span className="font-semibold text-stone-800 group-hover:text-forest-600 transition-colors">
-              Mutual Aid
+              {config.shortName}
             </span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            {navigation.map((item) => (
+            {config.nav.items.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
@@ -51,10 +49,10 @@ export function Header() {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
             <Button variant="outline" size="sm" asChild>
-              <Link href="/request-help">I Need Help</Link>
+              <Link href="/request-help">{config.hero.ctaPrimary}</Link>
             </Button>
             <Button size="sm" asChild>
-              <Link href="/offer-help">I Can Help</Link>
+              <Link href="/offer-help">{config.hero.ctaSecondary}</Link>
             </Button>
           </div>
 
@@ -94,7 +92,7 @@ export function Header() {
         {mobileMenuOpen && (
           <div className="md:hidden pb-4 border-t border-stone-100 mt-2 pt-4">
             <div className="flex flex-col gap-1">
-              {navigation.map((item) => (
+              {config.nav.items.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
@@ -112,10 +110,10 @@ export function Header() {
 
             <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-stone-100">
               <Button variant="outline" asChild>
-                <Link href="/request-help">I Need Help</Link>
+                <Link href="/request-help">{config.hero.ctaPrimary}</Link>
               </Button>
               <Button asChild>
-                <Link href="/offer-help">I Can Help</Link>
+                <Link href="/offer-help">{config.hero.ctaSecondary}</Link>
               </Button>
             </div>
           </div>

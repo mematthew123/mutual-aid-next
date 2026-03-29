@@ -5,6 +5,7 @@ import { Button, Badge, Card, CardContent } from "@/components/ui";
 import { PortableTextRenderer } from "@/components/portable-text";
 import { getCategoryIcon, LocationIcon } from "@/components/icons/category-icons";
 import { getResourceBySlug } from "@/lib/sanity";
+import { getSiteConfig } from "@/lib/site-config";
 
 interface ResourceDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -12,14 +13,17 @@ interface ResourceDetailPageProps {
 
 export async function generateMetadata({ params }: ResourceDetailPageProps) {
   const { slug } = await params;
-  const resource = await getResourceBySlug(slug);
+  const [resource, siteConfig] = await Promise.all([
+    getResourceBySlug(slug),
+    getSiteConfig(),
+  ]);
 
   if (!resource) {
     return { title: "Resource Not Found" };
   }
 
   return {
-    title: `${resource.name} | Mutual Aid Network`,
+    title: `${resource.name} | ${siteConfig.name}`,
     description: resource.description?.slice(0, 160),
   };
 }

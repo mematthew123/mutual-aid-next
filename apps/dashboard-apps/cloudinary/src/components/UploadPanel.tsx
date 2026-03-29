@@ -7,6 +7,23 @@ import type {
 
 const UPLOAD_SCRIPT_URL = 'https://upload-widget.cloudinary.com/global/all.js'
 
+const FOLDER_OPTIONS = [
+  {value: '', label: 'Root (no folder)'},
+  {value: 'events', label: 'Events'},
+  {value: 'campaigns', label: 'Campaigns'},
+  {value: 'team', label: 'Team'},
+  {value: 'resources', label: 'Resources'},
+  {value: 'pages', label: 'Pages'},
+]
+
+const TAG_SUGGESTIONS: Record<string, string[]> = {
+  events: ['event', 'community', 'volunteer'],
+  campaigns: ['campaign', 'donation', 'fundraiser'],
+  team: ['team', 'staff', 'headshot'],
+  resources: ['resource', 'logo', 'organization'],
+  pages: ['hero', 'banner', 'background'],
+}
+
 interface UploadPanelProps {
   config: {
     cloudName: string
@@ -28,6 +45,16 @@ export function UploadPanel({config}: UploadPanelProps) {
   const {loaded, error} = useExternalScript(UPLOAD_SCRIPT_URL)
   const [uploads, setUploads] = useState<UploadedFile[]>([])
   const [isOpen, setIsOpen] = useState(false)
+  const [targetFolder, setTargetFolder] = useState('')
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+
+  const suggestedTags = TAG_SUGGESTIONS[targetFolder] || []
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
+    )
+  }
 
   const handleUploadResult = useCallback(
     (_error: Error | null, result: CloudinaryUploadResult) => {
@@ -54,12 +81,15 @@ export function UploadPanel({config}: UploadPanelProps) {
   useEffect(() => {
     if (!loaded || !window.cloudinary) return
 
+    widgetRef.current?.destroy()
     widgetRef.current = window.cloudinary.createUploadWidget(
       {
         cloudName: config.cloudName,
         uploadPreset: config.uploadPreset || 'ml_default',
         sources: ['local', 'url', 'camera'],
         multiple: true,
+        ...(targetFolder ? {folder: targetFolder} : {}),
+        ...(selectedTags.length > 0 ? {tags: selectedTags} : {}),
       },
       handleUploadResult,
     )
@@ -67,7 +97,7 @@ export function UploadPanel({config}: UploadPanelProps) {
     return () => {
       widgetRef.current?.destroy()
     }
-  }, [loaded, config.cloudName, config.uploadPreset, handleUploadResult])
+  }, [loaded, config.cloudName, config.uploadPreset, targetFolder, selectedTags, handleUploadResult])
 
   const openWidget = () => {
     widgetRef.current?.open()
@@ -128,7 +158,54 @@ export function UploadPanel({config}: UploadPanelProps) {
 
   return (
     <div className="p-6">
-      <div className="flex justify-center py-8">
+      {/* Upload options */}
+      <div className="max-w-md mx-auto mb-6 flex flex-col gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            Destination Folder
+          </label>
+          <select
+            value={targetFolder}
+            onChange={(e) => {
+              setTargetFolder(e.target.value)
+              setSelectedTags([])
+            }}
+            className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-white text-gray-700 outline-hidden focus:border-cl-blue cursor-pointer"
+          >
+            {FOLDER_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {suggestedTags.length > 0 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Tags
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {suggestedTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border cursor-pointer transition-colors duration-150 ${
+                    selectedTags.includes(tag)
+                      ? 'bg-cl-blue text-white border-cl-blue'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                  }`}
+                  type="button"
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex justify-center py-4">
         <button
           className="px-8 py-3 bg-cl-blue text-white border-none rounded-lg text-sm/5 font-medium cursor-pointer transition-colors duration-150 hover:bg-cl-blue-dark disabled:opacity-60 disabled:cursor-not-allowed"
           onClick={openWidget}

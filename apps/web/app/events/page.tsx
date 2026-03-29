@@ -3,14 +3,18 @@ import { EmptyState } from "@/components/ui";
 import { EventCard } from "@/components/cards";
 import { ClockIcon } from "@/components/icons/category-icons";
 import { getAllEvents } from "@/lib/sanity";
+import { getSiteConfig, defaults as siteConfigDefaults } from "@/lib/site-config";
 
 export const metadata = {
-  title: "Community Events | Mutual Aid Network",
-  description: "Join community events including distributions, volunteer days, workshops, and social gatherings.",
+  title: `${siteConfigDefaults.pages.events.title} | ${siteConfigDefaults.name}`,
+  description: siteConfigDefaults.pages.events.description,
 };
 
 export default async function EventsPage() {
-  const events = await getAllEvents();
+  const [events, siteConfig] = await Promise.all([
+    getAllEvents(),
+    getSiteConfig(),
+  ]);
 
   // Separate upcoming and past events
   const now = new Date();
@@ -29,10 +33,10 @@ export default async function EventsPage() {
         <Container>
           <div className="text-center">
             <h1 className="text-3xl sm:text-4xl font-bold text-stone-800">
-              Community Events
+              {siteConfig.pages.events.title}
             </h1>
             <p className="mt-3 text-stone-600 text-lg max-w-xl mx-auto">
-              Join us at distributions, volunteer days, workshops, and community gatherings.
+              {siteConfig.pages.events.description}
             </p>
           </div>
         </Container>

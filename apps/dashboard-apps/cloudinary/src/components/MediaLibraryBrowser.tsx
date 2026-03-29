@@ -1,6 +1,9 @@
-import {useCallback, useRef, useState, useMemo} from 'react'
+import {useCallback, useEffect, useRef, useState, useMemo} from 'react'
 import {useCloudinaryAssets} from '../hooks/useCloudinaryAssets'
+import {AssetDetailPanel} from './AssetDetailPanel'
 import type {CloudinaryProxyAsset} from '../types/cloudinary'
+
+const API_BASE = import.meta.env.SANITY_APP_API_URL || 'http://localhost:3000'
 
 interface MediaLibraryBrowserProps {
   config: {
@@ -18,8 +21,25 @@ function formatBytes(bytes: number): string {
 export function MediaLibraryBrowser({config}: MediaLibraryBrowserProps) {
   const [searchInput, setSearchInput] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
-  const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [selectedFolder, setSelectedFolder] = useState('')
+  const [selectedTag, setSelectedTag] = useState('')
+  const [selectedAsset, setSelectedAsset] = useState<CloudinaryProxyAsset | null>(null)
+  const [folders, setFolders] = useState<{name: string; path: string}[]>([])
+  const [tags, setTags] = useState<string[]>([])
   const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+
+  // Fetch folders and tags on mount
+  useEffect(() => {
+    fetch(`${API_BASE}/api/cloudinary?action=folders`)
+      .then((r) => r.json())
+      .then((data) => setFolders(data.folders || []))
+      .catch(() => {})
+
+    fetch(`${API_BASE}/api/cloudinary?action=tags`)
+      .then((r) => r.json())
+      .then((data) => setTags(data.tags || []))
+      .catch(() => {})
+  }, [])
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchInput(value)
@@ -30,8 +50,12 @@ export function MediaLibraryBrowser({config}: MediaLibraryBrowserProps) {
   }, [])
 
   const options = useMemo(
-    () => (debouncedQuery ? {query: debouncedQuery} : {}),
-    [debouncedQuery],
+    () => ({
+      ...(debouncedQuery ? {query: debouncedQuery} : {}),
+      ...(selectedFolder ? {folder: selectedFolder} : {}),
+      ...(selectedTag ? {tag: selectedTag} : {}),
+    }),
+    [debouncedQuery, selectedFolder, selectedTag],
   )
 
   const {assets, isLoading, error, hasMore, loadMore, refresh} =
@@ -42,15 +66,14 @@ export function MediaLibraryBrowser({config}: MediaLibraryBrowserProps) {
     return `https://res.cloudinary.com/${config.cloudName}/image/upload/c_fill,w_300,h_200,f_auto,q_auto/${asset.public_id}.${asset.format}`
   }
 
-  const copyUrl = async (asset: CloudinaryProxyAsset) => {
-    try {
-      await navigator.clipboard.writeText(asset.secure_url)
-      setCopiedId(asset.public_id)
-      setTimeout(() => setCopiedId(null), 2000)
-    } catch {
-      // Clipboard API may not be available in all contexts
-    }
+  const clearFilters = () => {
+    setSearchInput('')
+    setDebouncedQuery('')
+    setSelectedFolder('')
+    setSelectedTag('')
   }
+
+  const hasFilters = debouncedQuery || selectedFolder || selectedTag
 
   // Error state
   if (error && assets.length === 0) {
@@ -70,39 +93,82 @@ export function MediaLibraryBrowser({config}: MediaLibraryBrowserProps) {
 
   return (
     <div className="flex flex-col gap-4 p-5">
-      {/* Toolbar: search + refresh */}
-      <div className="flex gap-3 items-center">
-        <div className="relative flex-1">
-          <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+      {/* Toolbar: search + filters + refresh */}
+      <div className="flex flex-col gap-3">
+        <div className="flex gap-3 items-center">
+          <div className="relative flex-1">
+            <svg
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search assets..."
+              value={searchInput}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm/5 bg-white text-gray-900 placeholder-gray-400 outline-hidden focus:border-cl-blue transition-colors duration-150"
+            />
+          </div>
+          <button
+            className="px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-500 cursor-pointer text-sm hover:bg-gray-50 hover:border-gray-300 transition-colors duration-150"
+            onClick={refresh}
+            title="Refresh"
+            type="button"
           >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search assets..."
-            value={searchInput}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm/5 bg-white text-gray-900 placeholder-gray-400 outline-hidden focus:border-cl-blue transition-colors duration-150"
-          />
+            &#x21bb;
+          </button>
         </div>
-        <button
-          className="px-3 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-500 cursor-pointer text-sm hover:bg-gray-50 hover:border-gray-300 transition-colors duration-150"
-          onClick={refresh}
-          title="Refresh"
-          type="button"
-        >
-          &#x21bb;
-        </button>
+
+        {/* Filter row */}
+        <div className="flex gap-3 items-center flex-wrap">
+          {/* Folder filter */}
+          <select
+            value={selectedFolder}
+            onChange={(e) => setSelectedFolder(e.target.value)}
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-700 outline-hidden focus:border-cl-blue cursor-pointer"
+          >
+            <option value="">All Folders</option>
+            {folders.map((f) => (
+              <option key={f.path} value={f.path}>
+                {f.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Tag filter */}
+          <select
+            value={selectedTag}
+            onChange={(e) => setSelectedTag(e.target.value)}
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-700 outline-hidden focus:border-cl-blue cursor-pointer"
+          >
+            <option value="">All Tags</option>
+            {tags.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+
+          {hasFilters && (
+            <button
+              className="px-3 py-2 text-xs text-cl-blue bg-transparent border-none cursor-pointer hover:underline"
+              onClick={clearFilters}
+              type="button"
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Asset count */}
@@ -142,10 +208,19 @@ export function MediaLibraryBrowser({config}: MediaLibraryBrowserProps) {
             <polyline points="21 15 16 10 5 21" />
           </svg>
           <p className="m-0 text-sm">
-            {debouncedQuery
-              ? 'No assets match your search'
+            {hasFilters
+              ? 'No assets match your filters'
               : 'No assets found in your Cloudinary account'}
           </p>
+          {hasFilters && (
+            <button
+              className="px-4 py-2 text-sm text-cl-blue bg-transparent border border-cl-blue rounded-lg cursor-pointer hover:bg-blue-50"
+              onClick={clearFilters}
+              type="button"
+            >
+              Clear filters
+            </button>
+          )}
         </div>
       )}
 
@@ -154,7 +229,6 @@ export function MediaLibraryBrowser({config}: MediaLibraryBrowserProps) {
         <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
           {assets.map((asset) => {
             const thumb = thumbnailUrl(asset)
-            const isCopied = copiedId === asset.public_id
             const displayName =
               asset.public_id.split('/').pop() || asset.public_id
 
@@ -162,8 +236,8 @@ export function MediaLibraryBrowser({config}: MediaLibraryBrowserProps) {
               <button
                 key={asset.public_id}
                 className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 cursor-pointer transition-all duration-150 hover:shadow-sm hover:border-gray-300 text-left p-0 relative"
-                onClick={() => copyUrl(asset)}
-                title={`Copy URL: ${asset.secure_url}`}
+                onClick={() => setSelectedAsset(asset)}
+                title={`View: ${asset.public_id}`}
                 type="button"
               >
                 {/* Thumbnail */}
@@ -202,15 +276,6 @@ export function MediaLibraryBrowser({config}: MediaLibraryBrowserProps) {
                     {asset.format} · {formatBytes(asset.bytes)}
                   </span>
                 </div>
-
-                {/* Copied confirmation overlay */}
-                {isCopied && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg">
-                    <span className="text-white text-sm font-medium px-3 py-1.5 bg-cl-green rounded-md">
-                      URL copied
-                    </span>
-                  </div>
-                )}
               </button>
             )
           })}
@@ -234,6 +299,15 @@ export function MediaLibraryBrowser({config}: MediaLibraryBrowserProps) {
             {isLoading ? 'Loading...' : 'Load More'}
           </button>
         </div>
+      )}
+
+      {/* Detail Panel */}
+      {selectedAsset && (
+        <AssetDetailPanel
+          asset={selectedAsset}
+          cloudName={config.cloudName}
+          onClose={() => setSelectedAsset(null)}
+        />
       )}
     </div>
   )

@@ -89,6 +89,10 @@ export interface Event {
   isRecurring?: boolean;
   recurrencePattern?: "weekly" | "biweekly" | "monthly" | "firstOfMonth" | "lastOfMonth";
   volunteersNeeded?: number;
+  image?: {
+    asset?: { _ref: string };
+    alt?: string;
+  };
 }
 
 export interface CommunityResource {
@@ -114,6 +118,9 @@ export interface CommunityResource {
   isFeatured?: boolean;
   isVerified?: boolean;
   lastVerified?: string;
+  logo?: {
+    asset?: { _ref: string };
+  };
 }
 
 export interface DonationCampaign {
@@ -170,6 +177,9 @@ export interface TeamMember {
   role?: string;
   bio?: string;
   email?: string;
+  photo?: {
+    asset?: { _ref: string };
+  };
 }
 
 export interface Page {
@@ -190,11 +200,55 @@ export interface Settings {
   _id: string;
   _type: "settings";
   title: string;
+  shortName?: string;
   tagline?: string;
   description?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  address?: string;
+  footerNote?: string;
+  logo?: {
+    asset?: { _ref: string };
+  };
+  hero?: {
+    badge?: string;
+    heading?: string;
+    headingAccent?: string;
+    description?: string;
+    ctaPrimary?: string;
+    ctaSecondary?: string;
+  };
+  cta?: {
+    heading?: string;
+    description?: string;
+    primaryAction?: string;
+    secondaryAction?: string;
+  };
+  terminology?: {
+    member?: string;
+    members?: string;
+    organizer?: string;
+    organizers?: string;
+    helper?: string;
+    helpers?: string;
+    helping?: string;
+  };
+  impactStats?: Array<{
+    label: string;
+    value: string;
+  }>;
+  contact?: {
+    email?: string;
+    phone?: string;
+    address?: string;
+  };
+  social?: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    tiktok?: string;
+  };
+  serviceArea?: {
+    description?: string;
+    neighborhoods?: string[];
+  };
 }
 
 // Query filter types

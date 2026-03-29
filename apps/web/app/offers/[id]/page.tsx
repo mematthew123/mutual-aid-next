@@ -4,6 +4,7 @@ import { Container, Section } from "@/components/layout";
 import { Button, Badge, Card, CardContent } from "@/components/ui";
 import { getCategoryIcon, LocationIcon, ClockIcon, HeartIcon } from "@/components/icons/category-icons";
 import { getOfferById } from "@/lib/sanity";
+import { getSiteConfig } from "@/lib/site-config";
 
 interface OfferDetailPageProps {
   params: Promise<{ id: string }>;
@@ -11,14 +12,17 @@ interface OfferDetailPageProps {
 
 export async function generateMetadata({ params }: OfferDetailPageProps) {
   const { id } = await params;
-  const offer = await getOfferById(id);
+  const [offer, siteConfig] = await Promise.all([
+    getOfferById(id),
+    getSiteConfig(),
+  ]);
 
   if (!offer) {
     return { title: "Offer Not Found" };
   }
 
   return {
-    title: `${offer.title} | Mutual Aid Network`,
+    title: `${offer.title} | ${siteConfig.name}`,
     description: offer.description?.slice(0, 160),
   };
 }
@@ -47,7 +51,10 @@ const dayLabels = {
 
 export default async function OfferDetailPage({ params }: OfferDetailPageProps) {
   const { id } = await params;
-  const offer = await getOfferById(id);
+  const [offer, siteConfig] = await Promise.all([
+    getOfferById(id),
+    getSiteConfig(),
+  ]);
 
   if (!offer) {
     notFound();
@@ -86,8 +93,8 @@ export default async function OfferDetailPage({ params }: OfferDetailPageProps) 
               <Card variant="elevated">
                 <CardContent className="p-6 lg:p-8">
                   {/* Header */}
-                  <div className="flex items-center gap-2 text-forest-600 mb-4">
-                    <HeartIcon className="size-5 fill-forest-100" />
+                  <div className="flex items-center gap-2 text-wheat-600 mb-4">
+                    <HeartIcon className="size-5 fill-wheat-100" />
                     <span className="font-medium">Offering Help</span>
                     {offer.offerType && (
                       <Badge variant="success" className="ml-2">
@@ -175,7 +182,7 @@ export default async function OfferDetailPage({ params }: OfferDetailPageProps) 
                     Need this help?
                   </h2>
                   <p className="text-stone-600 text-sm mb-6">
-                    Reach out to connect with this volunteer. A coordinator may
+                    Reach out to connect with this {siteConfig.terms.helper}. An {siteConfig.terms.organizer} may
                     help facilitate the connection.
                   </p>
 

@@ -3,14 +3,18 @@ import { EmptyState } from "@/components/ui";
 import { ResourceCard } from "@/components/cards";
 import { HeartIcon } from "@/components/icons/category-icons";
 import { getAllResources } from "@/lib/sanity";
+import { getSiteConfig, defaults as siteConfigDefaults } from "@/lib/site-config";
 
 export const metadata = {
-  title: "Community Resources | Mutual Aid Network",
-  description: "Find local organizations, services, and resources to help you and your family.",
+  title: `${siteConfigDefaults.pages.resources.title} | ${siteConfigDefaults.name}`,
+  description: siteConfigDefaults.pages.resources.description,
 };
 
 export default async function ResourcesPage() {
-  const resources = await getAllResources();
+  const [resources, siteConfig] = await Promise.all([
+    getAllResources(),
+    getSiteConfig(),
+  ]);
 
   const featuredResources = resources.filter((r) => r.isFeatured);
   const otherResources = resources.filter((r) => !r.isFeatured);
@@ -22,10 +26,10 @@ export default async function ResourcesPage() {
         <Container>
           <div className="text-center">
             <h1 className="text-3xl sm:text-4xl font-bold text-stone-800">
-              Community Resources
+              {siteConfig.pages.resources.title}
             </h1>
             <p className="mt-3 text-stone-600 text-lg max-w-xl mx-auto">
-              Local organizations, services, and resources to support you and your neighbors.
+              {siteConfig.pages.resources.description}
             </p>
           </div>
         </Container>
@@ -79,7 +83,7 @@ export default async function ResourcesPage() {
             </h2>
             <p className="mt-3 text-stone-600">
               Help us grow our community resource directory by sharing organizations
-              and services that help our neighbors.
+              and services that support our {siteConfig.terms.members}.
             </p>
           </div>
         </Container>

@@ -4,6 +4,7 @@ import { Container, Section } from "@/components/layout";
 import { Button, Badge, UrgencyBadge, Card, CardContent } from "@/components/ui";
 import { getCategoryIcon, LocationIcon, ClockIcon } from "@/components/icons/category-icons";
 import { getRequestById } from "@/lib/sanity";
+import { getSiteConfig } from "@/lib/site-config";
 
 interface RequestDetailPageProps {
   params: Promise<{ id: string }>;
@@ -11,21 +12,27 @@ interface RequestDetailPageProps {
 
 export async function generateMetadata({ params }: RequestDetailPageProps) {
   const { id } = await params;
-  const request = await getRequestById(id);
+  const [request, siteConfig] = await Promise.all([
+    getRequestById(id),
+    getSiteConfig(),
+  ]);
 
   if (!request) {
     return { title: "Request Not Found" };
   }
 
   return {
-    title: `${request.title} | Mutual Aid Network`,
+    title: `${request.title} | ${siteConfig.name}`,
     description: request.description?.slice(0, 160),
   };
 }
 
 export default async function RequestDetailPage({ params }: RequestDetailPageProps) {
   const { id } = await params;
-  const request = await getRequestById(id);
+  const [request, siteConfig] = await Promise.all([
+    getRequestById(id),
+    getSiteConfig(),
+  ]);
 
   if (!request) {
     notFound();
@@ -110,10 +117,10 @@ export default async function RequestDetailPage({ params }: RequestDetailPagePro
                   </h2>
                   <p className="text-stone-600 text-sm mb-6">
                     {request.contactPreference === "throughCoordinator"
-                      ? "A coordinator will facilitate the connection to protect everyone's privacy."
+                      ? `An ${siteConfig.terms.organizer} will facilitate the connection to protect everyone's privacy.`
                       : request.contactPreference === "anonymous"
-                      ? "This neighbor would like to remain anonymous."
-                      : "You can reach out directly to this neighbor."}
+                      ? "This person would like to remain anonymous."
+                      : "You can reach out directly to this person."}
                   </p>
 
                   <Button className="w-full" size="lg" asChild>

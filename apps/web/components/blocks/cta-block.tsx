@@ -72,7 +72,7 @@ export function CtaBlock({
             </p>
           )}
           <Button
-            variant={isHighlight ? "secondary" : "default"}
+            variant={isHighlight ? "secondary" : "primary"}
             size="lg"
             asChild
           >

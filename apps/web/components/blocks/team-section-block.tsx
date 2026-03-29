@@ -1,6 +1,7 @@
 import { Container, Section } from "@/components/layout";
 import { Card, CardContent } from "@/components/ui";
 import { client } from "@/lib/sanity/client";
+import { sanityImageUrl } from "@/lib/sanity/image";
 import type { TeamMember } from "@/lib/sanity/types";
 
 interface TeamSectionBlockProps {
@@ -26,7 +27,7 @@ export async function TeamSectionBlock({
     members = selectedMembers;
   } else {
     members = await client.fetch<TeamMember[]>(
-      `*[_type == "teamMember"] | order(name asc) { _id, name, role, bio, email }`
+      `*[_type == "teamMember"] | order(name asc) { _id, name, role, bio, email, photo { asset } }`
     );
   }
 
@@ -51,9 +52,17 @@ export async function TeamSectionBlock({
             {members.map((member) => (
               <Card key={member._id}>
                 <CardContent className="p-5 flex items-center gap-4">
-                  <div className="size-12 rounded-full bg-forest-100 flex items-center justify-center text-forest-700 font-bold text-lg shrink-0">
-                    {member.name.charAt(0)}
-                  </div>
+                  {sanityImageUrl(member.photo) ? (
+                    <img
+                      src={sanityImageUrl(member.photo, { width: 96, height: 96, fit: "crop" })!}
+                      alt={member.name}
+                      className="size-12 rounded-full object-cover shrink-0"
+                    />
+                  ) : (
+                    <div className="size-12 rounded-full bg-forest-100 flex items-center justify-center text-forest-700 font-bold text-lg shrink-0">
+                      {member.name.charAt(0)}
+                    </div>
+                  )}
                   <div>
                     <p className="font-semibold text-stone-800">{member.name}</p>
                     {member.role && (
@@ -69,9 +78,17 @@ export async function TeamSectionBlock({
             {members.map((member) => (
               <Card key={member._id}>
                 <CardContent className="p-6 text-center">
-                  <div className="size-16 rounded-full bg-forest-100 flex items-center justify-center text-forest-700 font-bold text-2xl mx-auto mb-4">
-                    {member.name.charAt(0)}
-                  </div>
+                  {sanityImageUrl(member.photo) ? (
+                    <img
+                      src={sanityImageUrl(member.photo, { width: 128, height: 128, fit: "crop" })!}
+                      alt={member.name}
+                      className="size-16 rounded-full object-cover mx-auto mb-4"
+                    />
+                  ) : (
+                    <div className="size-16 rounded-full bg-forest-100 flex items-center justify-center text-forest-700 font-bold text-2xl mx-auto mb-4">
+                      {member.name.charAt(0)}
+                    </div>
+                  )}
                   <p className="font-semibold text-stone-800 text-lg">
                     {member.name}
                   </p>

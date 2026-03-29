@@ -4,19 +4,13 @@ import { Button, Card, CardContent, Badge } from "@/components/ui";
 import { RequestCard, OfferCard } from "@/components/cards";
 import { HeartIcon, FoodIcon, TransportIcon, HousingIcon } from "@/components/icons/category-icons";
 import { getFeaturedRequests, getFeaturedOffers } from "@/lib/sanity";
-
-const impactStats = [
-  { label: "Families Helped", value: "1,247" },
-  { label: "Meals Provided", value: "8,500+" },
-  { label: "Volunteer Hours", value: "3,200" },
-  { label: "Active Volunteers", value: "156" },
-];
+import { getSiteConfig } from "@/lib/site-config";
 
 export default async function HomePage() {
-  // Fetch real data from Sanity
-  const [requests, offers] = await Promise.all([
+  const [requests, offers, siteConfig] = await Promise.all([
     getFeaturedRequests(6),
     getFeaturedOffers(3),
+    getSiteConfig(),
   ]);
 
   return (
@@ -27,25 +21,24 @@ export default async function HomePage() {
           <div className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-forest-100 text-forest-700 text-sm font-medium mb-6">
               <HeartIcon className="size-4" />
-              <span>Community Support Network</span>
+              <span>{siteConfig.hero.badge}</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-stone-800 tracking-tight">
-              Neighbors helping
-              <span className="text-forest-500"> neighbors</span>
+              {siteConfig.hero.heading}
+              <span className="text-forest-500"> {siteConfig.hero.headingAccent}</span>
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl text-stone-600 leading-relaxed">
-              Whether you need help or want to offer support, our community is
-              here for you. Together, we build a stronger neighborhood.
+              {siteConfig.hero.description}
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
-                <Link href="/request-help">I Need Help</Link>
+                <Link href="/request-help">{siteConfig.hero.ctaPrimary}</Link>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <Link href="/offer-help">I Can Help</Link>
+                <Link href="/offer-help">{siteConfig.hero.ctaSecondary}</Link>
               </Button>
             </div>
           </div>
@@ -56,9 +49,9 @@ export default async function HomePage() {
       <Section spacing="lg">
         <Container>
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-stone-800">How It Works</h2>
+            <h2 className="text-3xl font-bold text-stone-800">{siteConfig.howItWorks.heading}</h2>
             <p className="mt-4 text-stone-600">
-              Getting help or offering support is simple
+              {siteConfig.howItWorks.description}
             </p>
           </div>
 
@@ -66,30 +59,27 @@ export default async function HomePage() {
             {[
               {
                 step: "1",
-                title: "Share Your Need",
-                description:
-                  "Tell us what kind of help you need. Your privacy is always protected.",
+                ...siteConfig.howItWorks.steps[0],
                 icon: FoodIcon,
+                color: "bg-forest-100 text-forest-600",
               },
               {
                 step: "2",
-                title: "Get Connected",
-                description:
-                  "We match you with neighbors who can help. You decide how to connect.",
+                ...siteConfig.howItWorks.steps[1],
                 icon: TransportIcon,
+                color: "bg-wheat-100 text-wheat-600",
               },
               {
                 step: "3",
-                title: "Receive Support",
-                description:
-                  "Get the help you need from caring community members.",
+                ...siteConfig.howItWorks.steps[2],
                 icon: HousingIcon,
+                color: "bg-terracotta-100 text-terracotta-600",
               },
             ].map((item) => (
               <Card key={item.step} variant="outlined" className="text-center">
                 <CardContent className="pt-8 pb-6">
-                  <div className="size-12 rounded-2xl bg-forest-100 flex items-center justify-center mx-auto mb-4">
-                    <item.icon className="size-6 text-forest-600" />
+                  <div className={`size-12 rounded-2xl ${item.color.split(" ")[0]} flex items-center justify-center mx-auto mb-4`}>
+                    <item.icon className={`size-6 ${item.color.split(" ")[1]}`} />
                   </div>
                   <Badge variant="success" size="sm" className="mb-3">
                     Step {item.step}
@@ -111,14 +101,14 @@ export default async function HomePage() {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
             <div>
               <h2 className="text-3xl font-bold text-stone-800">
-                Current Needs
+                {siteConfig.pages.requests.title}
               </h2>
               <p className="mt-2 text-stone-600">
-                Neighbors who could use your help right now
+                {siteConfig.pages.requests.description}
               </p>
             </div>
             <Button variant="ghost" asChild>
-              <Link href="/requests">View all requests →</Link>
+              <Link href="/requests">View all requests &rarr;</Link>
             </Button>
           </div>
 
@@ -154,14 +144,14 @@ export default async function HomePage() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
               <div>
                 <h2 className="text-3xl font-bold text-stone-800">
-                  Available Help
+                  {siteConfig.pages.offers.title}
                 </h2>
                 <p className="mt-2 text-stone-600">
-                  Neighbors ready to lend a hand
+                  {siteConfig.pages.offers.description}
                 </p>
               </div>
               <Button variant="ghost" asChild>
-                <Link href="/offers">View all offers →</Link>
+                <Link href="/offers">View all offers &rarr;</Link>
               </Button>
             </div>
 
@@ -187,16 +177,24 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {impactStats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-4xl lg:text-5xl font-bold text-forest-500">
-                  {stat.value}
+            {siteConfig.impactStats.map((stat, index) => {
+              const colors = [
+                "text-forest-500",
+                "text-terracotta-500",
+                "text-wheat-500",
+                "text-sage-500",
+              ];
+              return (
+                <div key={stat.label} className="text-center">
+                  <div className={`text-4xl lg:text-5xl font-bold ${colors[index % colors.length]}`}>
+                    {stat.value}
+                  </div>
+                  <div className="mt-2 text-stone-600 font-medium">
+                    {stat.label}
+                  </div>
                 </div>
-                <div className="mt-2 text-stone-600 font-medium">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Container>
       </Section>
@@ -206,20 +204,19 @@ export default async function HomePage() {
         <Container size="md">
           <Card variant="elevated" className="text-center p-8 lg:p-12">
             <CardContent>
-              <HeartIcon className="size-12 text-forest-500 mx-auto mb-6" />
+              <HeartIcon className="size-12 text-terracotta-500 mx-auto mb-6" />
               <h2 className="text-2xl lg:text-3xl font-bold text-stone-800">
-                Ready to make a difference?
+                {siteConfig.cta.heading}
               </h2>
               <p className="mt-4 text-stone-600 max-w-lg mx-auto">
-                Join our community of neighbors helping neighbors. Every act of
-                kindness strengthens our community.
+                {siteConfig.cta.description}
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" asChild>
-                  <Link href="/offer-help">Start Volunteering</Link>
+                  <Link href="/offer-help">{siteConfig.cta.primaryAction}</Link>
                 </Button>
                 <Button variant="secondary" size="lg" asChild>
-                  <Link href="/donate">Donate</Link>
+                  <Link href="/donate">{siteConfig.cta.secondaryAction}</Link>
                 </Button>
               </div>
             </CardContent>

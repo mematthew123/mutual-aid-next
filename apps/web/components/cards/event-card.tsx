@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LocationIcon, ClockIcon } from "@/components/icons/category-icons";
+import { sanityImageUrl } from "@/lib/sanity/image";
 import type { Event } from "@/lib/sanity/types";
 
 export interface EventCardProps extends HTMLAttributes<HTMLDivElement> {
@@ -64,17 +65,30 @@ const EventCard = forwardRef<HTMLDivElement, EventCardProps>(
         ? "Hybrid"
         : event.location?.venue || "In-Person";
 
+    const imageUrl = sanityImageUrl(event.image, { width: 600, height: 400, fit: "crop" });
+
     return (
       <Card
         ref={ref}
         className={cn("relative overflow-hidden", className)}
         {...props}
       >
+        {/* Event Image */}
+        {imageUrl && (
+          <div className="w-full h-48 overflow-hidden">
+            <img
+              src={imageUrl}
+              alt={event.image?.alt || event.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+
         <CardContent className="pt-6">
           {/* Date Badge */}
           <div className="flex items-start justify-between gap-4 mb-3">
             <div className="flex items-center gap-2">
-              <div className="flex flex-col items-center justify-center size-12 rounded-lg bg-forest-50 text-forest-700">
+              <div className="flex flex-col items-center justify-center size-12 rounded-lg bg-terracotta-50 text-terracotta-700">
                 <span className="text-xs font-medium uppercase">
                   {startDate.toLocaleDateString("en-US", { month: "short" })}
                 </span>
