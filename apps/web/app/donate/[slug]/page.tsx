@@ -43,8 +43,8 @@ const platformLabels: Record<string, string> = {
 };
 
 function getPlatformUrl(platform: string, value: string): string {
-  if (platform === "venmo") return `https://venmo.com/${value.replace(/^@/, "")}`;
-  if (platform === "cashapp") return `https://cash.app/${value.replace(/^\$/, "$")}`;
+  if (platform === "venmo") return value.startsWith("http") ? value : `https://venmo.com/${value.replace(/^@/, "")}`;
+  if (platform === "cashapp") return value.startsWith("http") ? value : `https://cash.app/${value.replace(/^\$/, "$")}`;
   return value;
 }
 
