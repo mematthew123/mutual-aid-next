@@ -37,16 +37,19 @@ export function getWriteClient(): SanityClient {
   return _writeClient;
 }
 
-// Backward-compatible exports — these are Proxy wrappers that lazily create
-// the real client on first property access, avoiding the module-scope crash.
-export const client: SanityClient = new Proxy({} as SanityClient, {
-  get(_, prop) {
-    return (getClient() as unknown as Record<string | symbol, unknown>)[prop];
-  },
-});
+// Backward-compatible exports — Proxy wrappers that lazily create the real
+// client on first property access. Methods are bound to the real instance so
+// private fields (e.g. #httpRequest) work correctly.
+function lazyProxy(init: () => SanityClient): SanityClient {
+  let instance: SanityClient;
+  return new Proxy({} as SanityClient, {
+    get(_, prop) {
+      if (!instance) instance = init();
+      const value = (instance as unknown as Record<string | symbol, unknown>)[prop];
+      return typeof value === "function" ? (value as (...args: unknown[]) => unknown).bind(instance) : value;
+    },
+  });
+}
 
-export const writeClient: SanityClient = new Proxy({} as SanityClient, {
-  get(_, prop) {
-    return (getWriteClient() as unknown as Record<string | symbol, unknown>)[prop];
-  },
-});
+export const client: SanityClient = lazyProxy(getClient);
+export const writeClient: SanityClient = lazyProxy(getWriteClient);
