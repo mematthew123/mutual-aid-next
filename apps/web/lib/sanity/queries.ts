@@ -26,7 +26,7 @@ export async function getSettings(): Promise<Settings | null> {
       tagline,
       description,
       footerNote,
-      logo { asset, public_id, format, width, height, version, alt },
+      logo { asset, public_id, format, width, height, version, gravity, alt },
       hero,
       cta,
       terminology,
@@ -205,7 +205,7 @@ const eventProjection = `{
   maxAttendees,
   isRecurring,
   recurringPattern,
-  image { asset, alt, public_id, format, width, height, version }
+  image { asset, alt, public_id, format, width, height, version, gravity }
 }`;
 
 export async function getUpcomingEvents(limit: number = 5): Promise<Event[]> {
@@ -267,7 +267,7 @@ const resourceProjection = `{
   isFeatured,
   isVerified,
   lastVerified,
-  logo { asset, public_id, format, width, height, version, alt }
+  logo { asset, public_id, format, width, height, version, gravity, alt }
 }`;
 
 export async function getAllResources(): Promise<CommunityResource[]> {
@@ -356,7 +356,7 @@ const pageProjection = `{
     },
     _type == "teamSection" => {
       ...,
-      "teamMembers": teamMembers[]->{ _id, name, role, bio, email, photo { asset, public_id, format, width, height, version, alt } }
+      "teamMembers": teamMembers[]->{ _id, name, role, bio, email, photo { asset, public_id, format, width, height, version, gravity, alt } }
     }
   },
   seo

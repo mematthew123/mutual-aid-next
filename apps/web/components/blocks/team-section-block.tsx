@@ -27,7 +27,7 @@ export async function TeamSectionBlock({
     members = selectedMembers;
   } else {
     members = await client.fetch<TeamMember[]>(
-      `*[_type == "teamMember"] | order(name asc) { _id, name, role, bio, email, photo { asset, public_id, format, width, height, version, alt } }`
+      `*[_type == "teamMember"] | order(name asc) { _id, name, role, bio, email, photo { asset, public_id, format, width, height, version, gravity, alt } }`
     );
   }
 
@@ -54,12 +54,12 @@ export async function TeamSectionBlock({
                 <CardContent className="p-5 flex items-center gap-4">
                   {resolveImageUrl(member.photo as Record<string, unknown>) ? (
                     <img
-                      src={resolveImageUrl(member.photo as Record<string, unknown>, { width: 96, height: 96, fit: "crop" })!}
+                      src={resolveImageUrl(member.photo as Record<string, unknown>, { width: 208, height: 208, fit: "fill" })!}
                       alt={member.name}
-                      className="size-12 rounded-full object-cover shrink-0"
+                      className="size-52 rounded-b-sm object-cover shrink-0"
                     />
                   ) : (
-                    <div className="size-12 rounded-full bg-forest-100 flex items-center justify-center text-forest-700 font-bold text-lg shrink-0">
+                    <div className="size-52 rounded-b-sm bg-forest-100 flex items-center justify-center text-forest-700 font-bold text-lg shrink-0">
                       {member.name.charAt(0)}
                     </div>
                   )}
@@ -80,12 +80,12 @@ export async function TeamSectionBlock({
                 <CardContent className="p-6 text-center">
                   {resolveImageUrl(member.photo as Record<string, unknown>) ? (
                     <img
-                      src={resolveImageUrl(member.photo as Record<string, unknown>, { width: 128, height: 128, fit: "crop" })!}
+                      src={resolveImageUrl(member.photo as Record<string, unknown>, { width: 208, height: 208, fit: "fill" })!}
                       alt={member.name}
-                      className="size-16 rounded-full object-cover mx-auto mb-4"
+                      className="size-52 rounded-b-md object-cover mx-auto mb-4"
                     />
                   ) : (
-                    <div className="size-16 rounded-full bg-forest-100 flex items-center justify-center text-forest-700 font-bold text-2xl mx-auto mb-4">
+                    <div className="size-16 rounded-b-md bg-forest-100 flex items-center justify-center text-forest-700 font-bold text-2xl mx-auto mb-4">
                       {member.name.charAt(0)}
                     </div>
                   )}
