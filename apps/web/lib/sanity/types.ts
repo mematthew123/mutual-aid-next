@@ -7,6 +7,7 @@ export interface CloudinaryImage {
   width?: number;
   height?: number;
   version?: number;
+  gravity?: "auto" | "face" | "center";
   alt?: string;
 }
 

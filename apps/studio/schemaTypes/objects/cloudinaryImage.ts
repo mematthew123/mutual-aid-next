@@ -44,10 +44,35 @@ export const cloudinaryImage = defineType({
       hidden: true,
     }),
     defineField({
+      name: 'bytes',
+      title: 'File Size',
+      type: 'number',
+      readOnly: true,
+      hidden: true,
+    }),
+    defineField({
+      name: 'gravity',
+      title: 'Crop Focus',
+      type: 'string',
+      description: 'Where to focus when the image is cropped to fit a container',
+      options: {
+        list: [
+          {title: 'Auto (AI detect)', value: 'auto'},
+          {title: 'Face detection', value: 'face'},
+          {title: 'Center', value: 'center'},
+        ],
+      },
+      initialValue: 'auto',
+    }),
+    defineField({
       name: 'alt',
       title: 'Alt Text',
       type: 'string',
-      description: 'Describe the image for accessibility',
+      description: 'Describe the image for accessibility (recommended: 5–125 characters)',
+      validation: (rule) => [
+        rule.required().warning('Alt text is strongly recommended for accessibility'),
+        rule.max(125).warning('Keep alt text under 125 characters'),
+      ],
     }),
   ],
   components: {

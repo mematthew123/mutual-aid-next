@@ -18,6 +18,7 @@ export default defineConfig({
     cloudinaryAssetSourcePlugin({
       cloudName: process.env.SANITY_STUDIO_CLOUDINARY_CLOUD_NAME || '',
       apiKey: process.env.SANITY_STUDIO_CLOUDINARY_API_KEY || '',
+      uploadPreset: process.env.SANITY_STUDIO_CLOUDINARY_UPLOAD_PRESET || '',
     }),
   ],
 

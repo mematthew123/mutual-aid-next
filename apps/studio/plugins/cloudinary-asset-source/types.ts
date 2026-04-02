@@ -59,6 +59,39 @@ export interface CloudinaryMediaLibraryCallbacks {
   hideHandler?: () => void
 }
 
+export interface CloudinaryUploadWidgetOptions {
+  cloudName: string
+  uploadPreset: string
+  sources?: string[]
+  multiple?: boolean
+  folder?: string
+  tags?: string[]
+}
+
+export interface CloudinaryUploadResultInfo {
+  public_id: string
+  secure_url: string
+  url: string
+  format: string
+  width: number
+  height: number
+  bytes: number
+  version: number
+  created_at: string
+  tags: string[]
+}
+
+export interface CloudinaryUploadResult {
+  event: string
+  info: CloudinaryUploadResultInfo
+}
+
+export interface CloudinaryUploadWidget {
+  open: () => void
+  close: () => void
+  destroy: () => void
+}
+
 declare global {
   interface Window {
     cloudinary?: {
@@ -70,6 +103,10 @@ declare global {
         options: CloudinaryMediaLibraryOptions,
         callbacks: CloudinaryMediaLibraryCallbacks,
       ) => void
+      createUploadWidget: (
+        options: CloudinaryUploadWidgetOptions,
+        callback: (error: Error | null, result: CloudinaryUploadResult) => void,
+      ) => CloudinaryUploadWidget
     }
   }
 }

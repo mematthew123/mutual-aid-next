@@ -5,6 +5,7 @@ import {CloudinaryIcon} from './CloudinaryIcon'
 export interface CloudinaryPluginConfig {
   cloudName: string
   apiKey: string
+  uploadPreset?: string
 }
 
 const cloudinaryAssetSource = {

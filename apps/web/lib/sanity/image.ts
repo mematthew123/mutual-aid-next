@@ -108,9 +108,14 @@ export function resolveImageUrl(
 
   // New format: Cloudinary direct reference
   if (source.public_id && typeof source.public_id === "string") {
+    // Use the stored gravity as default when the caller doesn't specify one
+    const mergedOptions =
+      source.gravity && !options?.gravity
+        ? { ...options, gravity: source.gravity as ImageTransformOptions["gravity"] }
+        : options;
     return cloudinaryImageUrl(
       source as { public_id: string; format?: string; version?: number },
-      options
+      mergedOptions
     );
   }
 
