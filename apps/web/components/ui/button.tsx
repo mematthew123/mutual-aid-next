@@ -17,15 +17,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={cn(
           // Base styles
-          "inline-flex items-center justify-center gap-2 font-medium transition-all",
-          "rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-500/40 focus-visible:ring-offset-2",
+          "inline-flex items-center justify-center gap-2 font-medium",
+          "rounded-xl outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-500",
           "disabled:pointer-events-none disabled:opacity-50",
 
           // Size variants
           {
-            "px-4 py-2 text-sm": size === "sm",
-            "px-6 py-3 text-base": size === "md",
-            "px-8 py-4 text-lg": size === "lg",
+            "px-3 py-2 text-sm": size === "sm",
+            "px-4 py-3 text-base": size === "md",
+            "px-6 py-4 text-lg": size === "lg",
           },
 
           // Color variants

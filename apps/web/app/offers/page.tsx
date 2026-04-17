@@ -91,7 +91,7 @@ export default async function OffersPage({ searchParams }: OffersPageProps) {
                 {siteConfig.pages.offers.description}
               </p>
             </div>
-            <Button asChild>
+            <Button variant="outline" asChild>
               <Link href="/offer-help">Offer Your Help</Link>
             </Button>
           </div>

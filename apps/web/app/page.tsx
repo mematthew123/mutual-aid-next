@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Container, Section } from "@/components/layout";
-import { Button, Card, CardContent, Badge } from "@/components/ui";
+import { Button, Card, CardContent } from "@/components/ui";
 import { RequestCard, OfferCard } from "@/components/cards";
-import { HeartIcon, FoodIcon, TransportIcon, HousingIcon } from "@/components/icons/category-icons";
+import { HeartIcon } from "@/components/icons/category-icons";
 import { getFeaturedRequests, getFeaturedOffers } from "@/lib/sanity";
 import { getSiteConfig } from "@/lib/site-config";
 
@@ -49,49 +49,29 @@ export default async function HomePage() {
       <Section spacing="lg">
         <Container>
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-stone-800">{siteConfig.howItWorks.heading}</h2>
-            <p className="mt-4 text-stone-600">
+            <h2 className="mx-auto max-w-[40ch] text-3xl font-semibold tracking-tight text-balance text-stone-800">
+              {siteConfig.howItWorks.heading}
+            </h2>
+            <p className="mx-auto mt-4 max-w-[56ch] text-pretty text-stone-600">
               {siteConfig.howItWorks.description}
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                step: "1",
-                ...siteConfig.howItWorks.steps[0],
-                icon: FoodIcon,
-                color: "bg-forest-100 text-forest-600",
-              },
-              {
-                step: "2",
-                ...siteConfig.howItWorks.steps[1],
-                icon: TransportIcon,
-                color: "bg-wheat-100 text-wheat-600",
-              },
-              {
-                step: "3",
-                ...siteConfig.howItWorks.steps[2],
-                icon: HousingIcon,
-                color: "bg-terracotta-100 text-terracotta-600",
-              },
-            ].map((item) => (
-              <Card key={item.step} variant="outlined" className="text-center">
-                <CardContent className="pt-8 pb-6">
-                  <div className={`size-12 rounded-2xl ${item.color.split(" ")[0]} flex items-center justify-center mx-auto mb-4`}>
-                    <item.icon className={`size-6 ${item.color.split(" ")[1]}`} />
-                  </div>
-                  <Badge variant="success" size="sm" className="mb-3">
-                    Step {item.step}
-                  </Badge>
-                  <h3 className="text-lg font-semibold text-stone-800 mb-2">
-                    {item.title}
-                  </h3>
-                  <p className="text-stone-600 text-sm">{item.description}</p>
-                </CardContent>
-              </Card>
+          <dl className="grid md:grid-cols-3 gap-8">
+            {siteConfig.howItWorks.steps.map((item, index) => (
+              <div key={item.title} className="text-center">
+                <div className="mx-auto text-5xl font-semibold tabular-nums text-forest-500">
+                  {index + 1}
+                </div>
+                <dt className="mt-4 text-lg font-semibold text-stone-800">
+                  {item.title}
+                </dt>
+                <dd className="mt-2 text-stone-600 text-pretty">
+                  {item.description}
+                </dd>
+              </div>
             ))}
-          </div>
+          </dl>
         </Container>
       </Section>
 
@@ -204,18 +184,18 @@ export default async function HomePage() {
         <Container size="md">
           <Card variant="elevated" className="text-center p-8 lg:p-12">
             <CardContent>
-              <HeartIcon className="size-12 text-terracotta-500 mx-auto mb-6" />
-              <h2 className="text-2xl lg:text-3xl font-bold text-stone-800">
+              <HeartIcon className="size-6 text-terracotta-500 mx-auto mb-6" />
+              <h2 className="mx-auto max-w-[40ch] text-2xl lg:text-3xl font-semibold tracking-tight text-balance text-stone-800">
                 {siteConfig.cta.heading}
               </h2>
-              <p className="mt-4 text-stone-600 max-w-lg mx-auto">
+              <p className="mx-auto mt-4 max-w-[56ch] text-pretty text-stone-600">
                 {siteConfig.cta.description}
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" asChild>
+                <Button variant="secondary" size="lg" asChild>
                   <Link href="/offer-help">{siteConfig.cta.primaryAction}</Link>
                 </Button>
-                <Button variant="secondary" size="lg" asChild>
+                <Button variant="outline" size="lg" asChild>
                   <Link href="/donate">{siteConfig.cta.secondaryAction}</Link>
                 </Button>
               </div>

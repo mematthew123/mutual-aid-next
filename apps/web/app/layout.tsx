@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Figtree } from "next/font/google";
 import "./globals.css";
 import { Header, Footer } from "@/components/layout";
 import { getSiteConfig } from "@/lib/site-config";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
+const figtree = Figtree({ subsets: ["latin"], variable: "--font-figtree" });
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = await getSiteConfig();
@@ -26,7 +23,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${figtree.variable} antialiased`}>
         <div className="min-h-dvh flex flex-col">
           <Header config={config} />
           <main className="flex-1">{children}</main>

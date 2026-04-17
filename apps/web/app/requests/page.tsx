@@ -93,7 +93,7 @@ export default async function RequestsPage({ searchParams }: RequestsPageProps) 
                 {siteConfig.pages.requests.description}
               </p>
             </div>
-            <Button asChild>
+            <Button variant="outline" asChild>
               <Link href="/request-help">Submit a Request</Link>
             </Button>
           </div>

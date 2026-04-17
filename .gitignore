@@ -46,3 +46,10 @@ next-env.d.ts
 
 # sanity
 .sanity
+
+# mcp
+.mcp
+.mcp.json
+
+# claude
+.claude
